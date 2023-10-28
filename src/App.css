@@ -7,13 +7,13 @@
 .grid {
   display: flex;
   flex-wrap: wrap;
-  width: 200px;
+  width: 500px;  /* 20 squares * 25px each */
   margin: 0 auto;
 }
 
 .grid-cell {
-  width: 50px;
-  height: 50px;
+  width: 25px;
+  height: 25px;
   border: 1px solid #ddd;
 }
 
