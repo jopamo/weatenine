@@ -2,16 +2,29 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  // Dimensions
   const [xDimension, setXDimension] = useState(0);
   const [yDimension, setYDimension] = useState(0);
+
+  // default values
   const [color1, setColor1] = useState('rgb(255,0,0)');
   const [color2, setColor2] = useState('rgb(0,255,0)');
   const [color3, setColor3] = useState('rgb(0,0,255)');
+
+  // grid's data structure: a 2D array representing color and how many paint drops.
   const [grid, setGrid] = useState([]);
+
+  // flag indicating whether random painting is currently occurring
   const [isPainting, setIsPainting] = useState(false);
 
+  // window dimensions from browser, let's not have a giant grid on small screens
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  // converts "rgb(255,0,0)" into an array ([255,0,0])
   const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
 
+  // calculate average of colors. If no first color, just return the second.
   const mixColors = (colorA, colorB) => {
     if (!colorA) return colorB;
     if (!colorB) return colorA;
@@ -27,7 +40,7 @@ function App() {
     return `rgb(${r},${g},${b})`;
   };
 
-
+  // When grid dimensions change, we generate a new empty grid with the new dimensions.
   useEffect(() => {
     if (xDimension && yDimension) {
       const newGrid = Array.from({ length: yDimension }, () => Array.from({ length: xDimension }, () => ({ color: null, count: 0 })));
@@ -35,6 +48,7 @@ function App() {
     }
   }, [xDimension, yDimension]);
 
+  // Chooses a random cell and a random color to paint that cell.
   const paintRandomCell = () => {
     if (xDimension === 0 || yDimension === 0) return;
 
@@ -42,6 +56,7 @@ function App() {
     const y = Math.floor(Math.random() * yDimension);
     const chosenColor = [color1, color2, color3][Math.floor(Math.random() * 3)];
 
+    // Update grid state with new color for the chosen cell.
     setGrid((prevGrid) => {
       const newGrid = prevGrid.map(row => row.map(cell => ({ ...cell })));
       newGrid[y][x].color = mixColors(newGrid[y][x].color, chosenColor);
@@ -50,6 +65,7 @@ function App() {
     });
   };
 
+  // If painting is active, this effect sets up an interval to paint a random cell every 100ms.
   useEffect(() => {
     if (!isPainting) return;
 
@@ -60,17 +76,21 @@ function App() {
     return () => clearInterval(interval);
   }, [isPainting]);
 
+  // starts painting
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsPainting(true);
   };
 
+  // gridStyle is an object defining CSS styles for the grid, 'grid' sets display mode to grid
+  // gridTemplateColumns sets number and size of columns, justifyContent centers grid
   const gridStyle = {
     display: 'grid',
     gridTemplateColumns: `repeat(${xDimension}, 20px)`,
     justifyContent: 'center'
   };
 
+  //stop painting
   const handleStop = () => {
     setIsPainting(false);
   };
