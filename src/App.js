@@ -13,19 +13,19 @@ function App() {
   const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
 
   const mixColors = (colorA, colorB) => {
-  if (!colorA) return colorB;
-  if (!colorB) return colorA;
+    if (!colorA) return colorB;
+    if (!colorB) return colorA;
 
-  const [r1, g1, b1] = rgbStringToArray(colorA);
-  const [r2, g2, b2] = rgbStringToArray(colorB);
+    const [r1, g1, b1] = rgbStringToArray(colorA);
+    const [r2, g2, b2] = rgbStringToArray(colorB);
 
-  // 20% blend each drop
-  const r = Math.round(r1 + 0.2 * (r2 - r1));
-  const g = Math.round(g1 + 0.2 * (g2 - g1));
-  const b = Math.round(b1 + 0.2 * (b2 - b1));
+    // 20% blend each drop
+    const r = Math.round(r1 + 0.2 * (r2 - r1));
+    const g = Math.round(g1 + 0.2 * (g2 - g1));
+    const b = Math.round(b1 + 0.2 * (b2 - b1));
 
-  return `rgb(${r},${g},${b})`;
-};
+    return `rgb(${r},${g},${b})`;
+  };
 
 
   useEffect(() => {
