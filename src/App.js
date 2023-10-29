@@ -36,11 +36,11 @@ function App() {
   }, [xDimension, yDimension]);
 
   const paintRandomCell = () => {
+    if (xDimension === 0 || yDimension === 0) return;
+
     const x = Math.floor(Math.random() * xDimension);
     const y = Math.floor(Math.random() * yDimension);
     const chosenColor = [color1, color2, color3][Math.floor(Math.random() * 3)];
-
-    console.log(x, y, chosenColor);
 
     setGrid((prevGrid) => {
       const newGrid = prevGrid.map(row => row.map(cell => ({ ...cell })));
@@ -125,7 +125,7 @@ function App() {
           <option value="rgb(0,128,128)">Teal</option>
         </select>
       </label>
-      <button type="submit">Start Painting</button>
+      <button type="submit" disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
     </form>
 
       <button onClick={handleStop}>Stop Painting</button>
