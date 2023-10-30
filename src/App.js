@@ -3,8 +3,8 @@ import './App.css';
 
 function App() {
   // Dimensions
-  const [xDimension, setXDimension] = useState(0);
-  const [yDimension, setYDimension] = useState(0);
+  const [xDimension, setXDimension] = useState(5);
+  const [yDimension, setYDimension] = useState(5);
 
   // default values
   const [color1, setColor1] = useState('rgb(255,0,0)');
