@@ -79,8 +79,14 @@ function App() {
   // starts painting
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (xDimension <= 0 || yDimension <= 0) {
+        alert("Dimensions cannot be negative or zero!");
+        return;
+    }
+
     setIsPainting(true);
-  };
+};
 
   // gridStyle is an object defining CSS styles for the grid, 'grid' sets display mode to grid
   // gridTemplateColumns sets number and size of columns, justifyContent centers grid
@@ -100,11 +106,11 @@ function App() {
     <form onSubmit={handleSubmit}>
       <label>
         X Dimension:
-        <input type="number" value={xDimension} onChange={(e) => setXDimension(e.target.value)} />
+        <input type="number" min="2" value={xDimension} onChange={(e) => setXDimension(e.target.value)} />
       </label>
       <label>
         Y Dimension:
-        <input type="number" value={yDimension} onChange={(e) => setYDimension(e.target.value)} />
+        <input type="number" min="2" value={yDimension} onChange={(e) => setYDimension(e.target.value)} />
       </label>
       <label>
         Color 1:
