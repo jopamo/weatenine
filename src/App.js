@@ -191,11 +191,13 @@ function App() {
         </tr>
       </thead>
       <tbody>
-        {Object.entries(colorCounts).map(([color, count]) => (
-        <tr key={color}>
-          <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
-          <td>{count}</td>
-        </tr>
+        {Object.entries(colorCounts)
+          .filter(([color]) => [color1, color2, color3].includes(color))
+          .map(([color, count]) => (
+            <tr key={color}>
+              <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
+              <td>{count}</td>
+            </tr>
         ))}
       </tbody>
     </table>
