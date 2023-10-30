@@ -24,8 +24,9 @@ function App() {
   // converts "rgb(255,0,0)" into an array ([255,0,0])
   const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
 
-  // calculate average of colors. If no first color, just return the second.
+  // calculate color mix.
   const mixColors = (colorA, colorB) => {
+    // If no first color, just return the second
     if (!colorA) return colorB;
     if (!colorB) return colorA;
 
@@ -48,6 +49,17 @@ function App() {
     }
   }, [xDimension, yDimension]);
 
+  const [colorCounts, setColorCounts] = useState({
+    'rgb(255,0,0)': 0,  // Red
+    'rgb(0,255,0)': 0,  // Green
+    'rgb(0,0,255)': 0,  // Blue
+    'rgb(255,255,0)': 0,  // Yellow
+    'rgb(0,255,255)': 0,  // Cyan
+    'rgb(255,0,255)': 0,  // Magenta
+    'rgb(128,0,0)': 0,  // Maroon
+    'rgb(0,128,128)': 0  // Teal
+  });
+
   // Chooses a random cell and a random color to paint that cell.
   const paintRandomCell = () => {
     if (xDimension === 0 || yDimension === 0) return;
@@ -63,6 +75,11 @@ function App() {
       newGrid[y][x].count++;
       return newGrid;
     });
+
+    setColorCounts((prevCounts) => ({
+      ...prevCounts,
+      [chosenColor]: prevCounts[chosenColor] + 1
+    }));
   };
 
   // If painting is active, this effect sets up an interval to paint a random cell every 100ms.
@@ -71,7 +88,7 @@ function App() {
 
     const interval = setInterval(() => {
       paintRandomCell();
-    }, 100);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [isPainting]);
@@ -165,6 +182,24 @@ function App() {
           ></div>
         )))}
       </div>
+    <table>
+    <thead>
+        <tr>
+            <th>Color</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {Object.entries(colorCounts).map(([color, count]) => (
+            <tr key={color}>
+                <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
+                <td>{count}</td>
+            </tr>
+        ))}
+    </tbody>
+</table>
+
+
     </div>
   );
 }
