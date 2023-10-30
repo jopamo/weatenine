@@ -171,35 +171,34 @@ function App() {
       <button type="submit" disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
     </form>
 
-      <button onClick={handleStop}>Stop Painting</button>
+    <button onClick={handleStop}>Stop Painting</button>
 
-      <div className="grid" style={gridStyle}>
-        {grid.map((row, rowIndex) => row.map((cell, colIndex) => (
-          <div
-            key={`${rowIndex}-${colIndex}`}
-            className="cell"
-            style={{ backgroundColor: cell.color || 'grey' }}
-          ></div>
-        )))}
+    <div className="grid" style={gridStyle}>
+      {grid.map((row, rowIndex) => row.map((cell, colIndex) => (
+        <div
+          key={`${rowIndex}-${colIndex}`}
+          className="cell"
+          style={{ backgroundColor: cell.color || 'grey' }}
+         >
+        </div>
+      )))}
       </div>
     <table>
-    <thead>
+      <thead>
         <tr>
-            <th>Color</th>
-            <th>Count</th>
+          <th>Color</th>
+          <th>Count</th>
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {Object.entries(colorCounts).map(([color, count]) => (
-            <tr key={color}>
-                <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
-                <td>{count}</td>
-            </tr>
+        <tr key={color}>
+          <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
+          <td>{count}</td>
+        </tr>
         ))}
-    </tbody>
-</table>
-
-
+      </tbody>
+    </table>
     </div>
   );
 }
