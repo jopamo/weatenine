@@ -11,6 +11,7 @@
 - [🔄 Starting the Simulation](#-starting-the-simulation)
 - [🔬 Running Experiments](#-running-experiments)
 - [📈 Visualizing Results](#-visualizing-results)
+- [💻 Contribute](#-contribute)
 - [🎈 Conclusion](#-conclusion)
 
 ---
@@ -66,6 +67,49 @@ When you open the website, there's an animation that shows what you can do.
     2. Do a new experiment.
     3. Exit.
 
+---
+
+### 💻 Contribute
+
+- Windows: Use git bash, wsl2, or msys2?
+- MacOS: Use homebrew?
+- Linux: ...
+
+#### install nodejs
+* [Download](https://nodejs.org/en/download)
+
+#### github ssh setup
+* [Setup ssh github access](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+* [add generated public key to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account?tool=webui)
+
+### clone, code, and test react
+```
+cd ~/
+git clone git@github.com:jopamo/weatenine.git
+cd ~/weatenine
+npm install
+npm start
+
+```
+
+### pull latest changes and run local webserver for testing local changes
+> **_NOTE:_**  you're gonna want to have this running in one terminal window and control git in another, this will show errors/warnings in realtime.
+
+```
+cd ~/weatenine
+git pull
+npm start
+
+```
+
+### git add and commit
+```
+cd ~/weatenine
+git add .
+git commit -m "Your commit message"
+git push
+
+```
 ---
 
 ### 🎈 Conclusion
