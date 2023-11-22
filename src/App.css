@@ -11,15 +11,50 @@
   font-family: 'Arial', sans-serif;
   padding: 20px;
   text-align: center;
+  background-color: #282c34;
+  color: #fff;
 }
 
 form {
   margin-bottom: 20px;
 }
 
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 600px) {
+  .settings-form {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.form-group {
+  margin: 10px;
+}
+
 label {
   display: block;
-  margin: 10px 0;
+  margin-bottom: 5px;
+}
+
+input, select {
+  padding: 5px;
+  background-color: #333;
+  color: #ddd;
+  border: 1px solid #555;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 button {
@@ -30,7 +65,7 @@ button {
   background-color: #007BFF;
   color: white;
   border-radius: 4px;
-  margin-top: 10px;
+  transition: background-color 0.3s;
 }
 
 button:hover {
@@ -38,23 +73,31 @@ button:hover {
 }
 
 .grid {
-  border: 1px solid black;
+  border: 1px solid #333;
   margin-top: 20px;
 }
 
 .cell {
   width: 20px;
   height: 20px;
-  border: 1px solid lightgrey;
+  border: 1px solid #555;
   transition: background-color 0.5s ease-in-out;
+}
 
+table {
+  color: #fff;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #555;
+  padding: 8px;
+}
+
+table th {
+  background-color: #1c1c1c;
 }
 
 body {
-  background-color: #00000;
-}
-
-input, select {
-  padding: 5px;
-  margin-right: 10px;
+  background-color: #121212;
 }

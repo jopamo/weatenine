@@ -18,7 +18,9 @@
 
 ### 🎉 Introduction
 
-This is the user manual for the Random Paint Drops Simulation website.
+Hello, and thank you for utilizing our software!
+
+This application will allow you to create the picture of your dreams in only a few inputs from the user.
 
 ---
 
@@ -31,8 +33,9 @@ When you open the website, there's an animation that shows what you can do.
 ### 🖼 Setting Up the Canvas
 
 - Go to 'Simulation'.
-- Enter **X** and **Y dimensions** for the canvas.
-- Choose **three colors**.
+- You can utilize the X-Dimension textbox in order to adjust the horizontal size of the graph and you can use the Y-Dimension to adjust the vertical size of the grid.
+- Color 1, Color 2, and Color 3 can all be adjusted to an color available in the following boxes:
+Red, Green, Blue, Yellow, Cyan, Magenta, Maroon, and Teal.
 - Set the **stopping criterion**:
     1. Stop when all squares are painted.
     2. Stop when any square gets a second paint drop.
@@ -42,8 +45,8 @@ When you open the website, there's an animation that shows what you can do.
 
 ### 🔄 Starting the Simulation
 
-- Click 'Start Simulation'.
-- Watch the paint drops on the canvas.
+- Click 'Start Painting'.
+- Every second, one of your colors will be chosen and will replace a random element on your grid. If a color is chosen that already has a color present, then the previous color will be blended with the new color. The 'color tracker' on the left will keep track of all the colors used.
 - Use controls to change speed.
 - Click **CONTINUE** when finished.
 
