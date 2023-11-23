@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
+import { mixColors } from './paintTools';
+import { checkStoppingCriteria } from './paintTools';
 
 function App() {
   function debounce(fn, ms) {
@@ -29,29 +31,6 @@ function App() {
 
   const [xDimension, setXDimension] = useState(initialXDimension);
   const [yDimension, setYDimension] = useState(initialYDimension);
-
-  const stopPaintingAndReset = () => {
-    setIsPainting(false);
-    resetBoardAndCounts();
-  };
-
-  useEffect(() => {
-    const debouncedHandleResize = debounce(() => {
-      const { xDimension: newXDimension, yDimension: newYDimension } = calculateInitialDimensions();
-
-      if (newXDimension !== xDimension || newYDimension !== yDimension) {
-        stopPaintingAndReset();
-        setXDimension(newXDimension);
-        setYDimension(newYDimension);
-      }
-    }, 250);
-
-    window.addEventListener('resize', debouncedHandleResize);
-
-    return () => {
-      window.removeEventListener('resize', debouncedHandleResize);
-    };
-  }, [xDimension, yDimension]);
 
   let navigate = useNavigate();
 
@@ -87,28 +66,7 @@ function App() {
   // flag indicating whether random painting is currently occurring
   const [isPainting, setIsPainting] = useState(false);
 
-  // converts "rgb(255,0,0)" into an array ([255,0,0])
-  const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
 
-  // calculate color mix.
-  const mixColors = useCallback(
-    (colorA, colorB) => {
-      // If no first color, just return the second
-      if (!colorA) return colorB;
-      if (!colorB) return colorA;
-
-      const [r1, g1, b1] = rgbStringToArray(colorA);
-      const [r2, g2, b2] = rgbStringToArray(colorB);
-
-      // 20% blend each drop
-      const r = Math.round(r1 + 0.2 * (r2 - r1));
-      const g = Math.round(g1 + 0.2 * (g2 - g1));
-      const b = Math.round(b1 + 0.2 * (b2 - b1));
-
-      return `rgb(${r},${g},${b})`;
-    },
-    []
-  );
   const renderColorOptions = (excludeColors) => {
     return Object.entries(colorOptions)
       .filter(([colorValue]) => !excludeColors.includes(colorValue))
@@ -117,37 +75,14 @@ function App() {
       ));
   };
 
-  const checkStoppingCriteria = useCallback(
-    (grid) => {
-      switch (stoppingCriterion) {
-        case 'lastUnpainted':
-          if (grid.every(row => row.every(cell => cell.color !== null))) {
-            setIsPainting(false);
-            setStoppingCriteriaMessage('Stopped: All squares have been painted at least once.');
-          }
-          break;
+  const updateStoppingCriteria = useCallback(() => {
+    const result = checkStoppingCriteria(grid, stoppingCriterion, color1, color2, color3);
 
-        case 'secondBlob':
-          if (grid.some(row => row.some(cell => cell.count >= 2))) {
-            setIsPainting(false);
-            setStoppingCriteriaMessage('Stopped: A square has been painted twice.');
-          }
-          break;
-
-        case 'allMixedColors':
-          const allPainted = grid.every(row => row.every(cell => cell.color !== null && ![color1, color2, color3].includes(cell.color)));
-          if (allPainted) {
-            setIsPainting(false);
-            setStoppingCriteriaMessage('Stopped: The entire board is filled with mixed colors.');
-          }
-          break;
-
-        default:
-          break;
-      };
-    },
-    [stoppingCriterion, color1, color2, color3]
-  );
+    if (result.met) {
+      setIsPainting(false);
+      setStoppingCriteriaMessage(result.message);
+    }
+  }, [grid, stoppingCriterion, color1, color2, color3]);
 
   // Function to draw the entire grid
   const drawGrid = useCallback(() => {
@@ -193,9 +128,49 @@ function App() {
 
   const [colorCounts, setColorCounts] = useState(initialColorCounts);
 
-  const resetColorCounts = () => {
+  const resetColorCounts = useCallback(() => {
     setColorCounts(initialColorCounts);
-  };
+  }, [initialColorCounts]);
+
+  const resetBoardAndCounts = useCallback(() => {
+    const newGrid = Array.from({ length: yDimension }, () =>
+      Array.from({ length: xDimension }, () => ({ color: null, count: 0 }))
+    );
+    setGrid(newGrid);
+    resetColorCounts();
+
+    // Clear the canvas
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1c1c1c'; // Background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Remove the stop message
+    setStoppingCriteriaMessage('');
+  }, [xDimension, yDimension, resetColorCounts]);
+
+  const stopPaintingAndReset = useCallback(() => {
+    setIsPainting(false);
+    resetBoardAndCounts();
+  }, [resetBoardAndCounts]);
+
+  useEffect(() => {
+    const debouncedHandleResize = debounce(() => {
+      const { xDimension: newXDimension, yDimension: newYDimension } = calculateInitialDimensions();
+
+      if (newXDimension !== xDimension || newYDimension !== yDimension) {
+        stopPaintingAndReset();
+        setXDimension(newXDimension);
+        setYDimension(newYDimension);
+      }
+    }, 250);
+
+    window.addEventListener('resize', debouncedHandleResize);
+
+    return () => {
+      window.removeEventListener('resize', debouncedHandleResize);
+    };
+  }, [xDimension, yDimension, stopPaintingAndReset]);
 
   // Chooses a random cell and a random color to paint that cell.
   // Define paintRandomCell using useCallback
@@ -212,7 +187,7 @@ function App() {
     newGrid[y][x].color = mixedColor;
     newGrid[y][x].count++;
     drawCell(ctxRef.current, x, y, mixedColor);
-    checkStoppingCriteria(newGrid);
+    updateStoppingCriteria(newGrid);
     return newGrid;
   });
 
@@ -220,7 +195,7 @@ function App() {
     ...prevCounts,
     [chosenColor]: prevCounts[chosenColor] + 1
   }));
-}, [xDimension, yDimension, color1, color2, color3, setGrid, setColorCounts, checkStoppingCriteria, mixColors]);
+}, [xDimension, yDimension, color1, color2, color3, setGrid, setColorCounts, updateStoppingCriteria]);
 
   // useEffect that depends on paintRandomCell
   useEffect(() => {
@@ -259,23 +234,6 @@ function App() {
     setIsPainting(true);
   };
 
-const resetBoardAndCounts = () => {
-    const newGrid = Array.from({ length: yDimension }, () =>
-        Array.from({ length: xDimension }, () => ({ color: null, count: 0 }))
-    );
-    setGrid(newGrid);
-    resetColorCounts();
-
-    // Clear the canvas
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#1c1c1c'; // Background color
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Remove the stop message
-    setStoppingCriteriaMessage('');
-};
-
 return (
   <div className="App">
     <div className="control-panel">
@@ -288,6 +246,7 @@ return (
             max="30"
             value={xDimension}
             onChange={(e) => setXDimension(e.target.value)}
+            disabled={isPainting}
             maxLength="2" />
         </div>
         <div className="form-group">
@@ -298,29 +257,42 @@ return (
             max="30"
             value={yDimension}
             onChange={(e) => setYDimension(e.target.value)}
+            disabled={isPainting}
             maxLength="2" />
         </div>
         <div className="form-group">
           <label>Color 1:</label>
-          <select value={color1} onChange={(e) => setColor1(e.target.value)}>
+          <select
+            value={color1}
+            onChange={(e) => setColor1(e.target.value)}
+            disabled={isPainting}
+          >
             {renderColorOptions([color2, color3])}
           </select>
         </div>
         <div className="form-group">
           <label>Color 2:</label>
-          <select value={color2} onChange={(e) => setColor2(e.target.value)}>
+          <select
+            value={color2}
+            onChange={(e) => setColor2(e.target.value)}
+            disabled={isPainting}
+          >
             {renderColorOptions([color1, color3])}
           </select>
         </div>
         <div className="form-group">
           <label>Color 3:</label>
-          <select value={color3} onChange={(e) => setColor3(e.target.value)}>
+          <select
+            value={color3}
+            onChange={(e) => setColor3(e.target.value)}
+            disabled={isPainting}
+          >
             {renderColorOptions([color1, color2])}
           </select>
         </div>
         <div className="form-group">
           <label>Stopping Criterion:</label>
-          <select value={stoppingCriterion} onChange={(e) => setStoppingCriterion(e.target.value)}>
+          <select value={stoppingCriterion} onChange={(e) => setStoppingCriterion(e.target.value)} disabled={isPainting}>
             <option value="lastUnpainted">Last Unpainted Square</option>
             <option value="secondBlob">Second Paint Blob on a Square</option>
             <option value="allMixedColors">Entire Board Mixed Colors</option>
