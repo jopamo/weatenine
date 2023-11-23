@@ -3,11 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 function App() {
-  const stopPainting = () => {
-    // Function to stop painting
-    setIsPainting(false);
-  };
-
   function debounce(fn, ms) {
     let timer;
     return _ => {
@@ -20,13 +15,12 @@ function App() {
   }
 
   const calculateInitialDimensions = () => {
-    // Calculate the initial dimensions based on the window size
     const width = window.innerWidth;
     const height = window.innerHeight;
     const isMobile = width < 768;
 
     const xDimension = Math.min(Math.floor(width / 50), 25);
-    const yDimension = isMobile ? 5 : Math.min(Math.floor(window.innerHeight / 50), 25);
+    const yDimension = isMobile ? 5 : Math.min(Math.floor(height / 50), 25);
 
     return { xDimension, yDimension };
   };
@@ -36,21 +30,28 @@ function App() {
   const [xDimension, setXDimension] = useState(initialXDimension);
   const [yDimension, setYDimension] = useState(initialYDimension);
 
+  const stopPaintingAndReset = () => {
+    setIsPainting(false);
+    resetBoardAndCounts();
+  };
+
   useEffect(() => {
     const debouncedHandleResize = debounce(() => {
-      stopPainting();
-      resetBoardAndCounts();
-      const { xDimension, yDimension } = calculateInitialDimensions();
-      setXDimension(xDimension);
-      setYDimension(yDimension);
-    }, 250); // 250ms delay
+      const { xDimension: newXDimension, yDimension: newYDimension } = calculateInitialDimensions();
+
+      if (newXDimension !== xDimension || newYDimension !== yDimension) {
+        stopPaintingAndReset();
+        setXDimension(newXDimension);
+        setYDimension(newYDimension);
+      }
+    }, 250);
 
     window.addEventListener('resize', debouncedHandleResize);
 
     return () => {
       window.removeEventListener('resize', debouncedHandleResize);
     };
-  }, []);
+  }, [xDimension, yDimension]);
 
   let navigate = useNavigate();
 
