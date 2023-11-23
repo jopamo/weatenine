@@ -21,8 +21,9 @@ function App() {
     const height = window.innerHeight;
     const isMobile = width < 768;
 
-    const xDimension = Math.min(Math.floor(width / 50), 25);
-    const yDimension = isMobile ? 5 : Math.min(Math.floor(height / 50), 25);
+    const xDimension = isMobile ? 10 : Math.min(Math.floor(width / 50), 25);
+    const yDimension = isMobile ? 10 : Math.min(Math.floor(window.innerHeight / 50), 25);
+
 
     return { xDimension, yDimension };
   };
@@ -65,7 +66,6 @@ function App() {
 
   // flag indicating whether random painting is currently occurring
   const [isPainting, setIsPainting] = useState(false);
-
 
   const renderColorOptions = (excludeColors) => {
     return Object.entries(colorOptions)
