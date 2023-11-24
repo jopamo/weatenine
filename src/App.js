@@ -64,6 +64,8 @@ function App({ setCurrentPage }) {
   // flag indicating whether random painting is currently occurring
   const [isPainting, setIsPainting] = useState(false);
 
+  const [dropSpeed, setDropSpeed] = useState(10);
+
   const renderColorOptions = (excludeColors) => {
     return Object.entries(colorOptions)
       .filter(([colorValue]) => !excludeColors.includes(colorValue))
@@ -194,16 +196,15 @@ function App({ setCurrentPage }) {
   }));
 }, [xDimension, yDimension, color1, color2, color3, setGrid, setColorCounts, updateStoppingCriteria]);
 
-  // useEffect that depends on paintRandomCell
   useEffect(() => {
     if (!isPainting) return;
 
     const interval = setInterval(() => {
       paintRandomCell();
-    }, 10);
+    }, 1000 / dropSpeed);
 
     return () => clearInterval(interval);
-  }, [isPainting, paintRandomCell]);
+  }, [isPainting, paintRandomCell, dropSpeed]);
 
   // Starts painting
   const handleSubmit = (e) => {
@@ -235,6 +236,7 @@ return (
   <div className="App">
     <div className="control-panel">
       <form onSubmit={handleSubmit} className="settings-form">
+        {/* Dimension Controls */}
         <div className="form-group">
           <label>X:</label>
           <input
@@ -289,24 +291,43 @@ return (
         </div>
         <div className="form-group">
           <label>Stopping Criterion:</label>
-          <select value={stoppingCriterion} onChange={(e) => setStoppingCriterion(e.target.value)} disabled={isPainting}>
+          <select
+            value={stoppingCriterion}
+            onChange={(e) => setStoppingCriterion(e.target.value)}
+            disabled={isPainting}
+          >
             <option value="lastUnpainted">Last Unpainted Square</option>
             <option value="secondBlob">Second Paint Blob on a Square</option>
             <option value="allMixedColors">Entire Board Mixed Colors</option>
           </select>
         </div>
+        {/* speed control */}
+        <div className="form-group">
+          <label>Drop Speed:</label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={dropSpeed}
+            onChange={(e) => setDropSpeed(e.target.value)}
+          />
+        </div>
+        {/* start and continue */}
         <div className="buttons-container">
           <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
           <button onClick={handleContinue}>Continue</button>
         </div>
       </form>
     </div>
+    {/* canvas-container */}
     <div className="canvas-container">
       <canvas ref={canvasRef} className="paintCanvas"></canvas>
     </div>
+    {/* stopping-criteria-message */}
     <div className="stopping-criteria-message">
       {stoppingCriteriaMessage && <p>{stoppingCriteriaMessage}</p>}
     </div>
+    {/* color-counts table */}
     <div className="color-counts">
       <table>
         <thead>
@@ -328,7 +349,7 @@ return (
       </table>
     </div>
   </div>
-  );
+);
 }
 
 export default App;
