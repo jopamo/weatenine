@@ -17,7 +17,6 @@ function App({ setCurrentPage }) {
 
   const calculateInitialDimensions = () => {
     const width = window.innerWidth;
-    const height = window.innerHeight;
     const isMobile = width < 768;
 
     const xDimension = isMobile ? 10 : Math.min(Math.floor(width / 50), 25);
@@ -236,7 +235,6 @@ return (
   <div className="App">
     <div className="control-panel">
       <form onSubmit={handleSubmit} className="settings-form">
-        {/* Dimension Controls */}
         <div className="form-group">
           <label>X:</label>
           <input
@@ -301,7 +299,6 @@ return (
             <option value="allMixedColors">Entire Board Mixed Colors</option>
           </select>
         </div>
-        {/* speed control */}
         <div className="form-group">
           <label>Drop Speed:</label>
           <input
@@ -312,22 +309,18 @@ return (
             onChange={(e) => setDropSpeed(e.target.value)}
           />
         </div>
-        {/* start and continue */}
         <div className="buttons-container">
           <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
           <button onClick={handleContinue}>Continue</button>
         </div>
       </form>
     </div>
-    {/* canvas-container */}
     <div className="canvas-container">
       <canvas ref={canvasRef} className="paintCanvas"></canvas>
     </div>
-    {/* stopping-criteria-message */}
     <div className="stopping-criteria-message">
       {stoppingCriteriaMessage && <p>{stoppingCriteriaMessage}</p>}
     </div>
-    {/* color-counts table */}
     <div className="color-counts">
       <table>
         <thead>
