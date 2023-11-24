@@ -1,20 +1,18 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function Experiments() {
-  const navigate = useNavigate();
-
+function Experiments({ setCurrentPage }) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/app');
-    }, 5000);
+      setCurrentPage('app');
+    }, 3000); // 3 seconds timeout
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [setCurrentPage]);
 
   return (
-    <div className="intro-animation">
-      <p>Experiments are under construction.</p>
+    <div>
+      <h1>Experiments Page</h1>
+      {/* whatever */}
     </div>
   );
 }

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { mixColors } from './paintTools';
 import { checkStoppingCriteria } from './paintTools';
 
-function App() {
+function App({ setCurrentPage }) {
   function debounce(fn, ms) {
     let timer;
     return _ => {
@@ -33,10 +32,8 @@ function App() {
   const [xDimension, setXDimension] = useState(initialXDimension);
   const [yDimension, setYDimension] = useState(initialYDimension);
 
-  let navigate = useNavigate();
-
   const handleContinue = () => {
-    navigate('/experiments');
+    setCurrentPage('experiments');
   };
 
   const canvasRef = useRef(null);

@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Intro.css';
+import React, { useEffect } from 'react';
 
-function Intro() {
-  const [isVisible, setIsVisible] = useState(true);
-  const navigate = useNavigate();
-
+function Intro({ setCurrentPage }) {
   useEffect(() => {
-    console.log("Intro mounted");
-
     const timer = setTimeout(() => {
-      setIsVisible(false);
-      console.log("Hiding Intro content and navigating to /app");
-      navigate('/app');
-    }, 5000);
+      setCurrentPage('app');
+    }, 3000); // 3 seconds timeout
 
-    return () => {
-      console.log("Intro unmounting");
-      clearTimeout(timer);
-    };
-  }, [navigate]);
+    return () => clearTimeout(timer);
+  }, [setCurrentPage]);
 
   return (
-    <div className="intro-animation">
-      {isVisible && <p>Loading…<br />(animation or some other form of communication placeholder)</p>}
+    <div>
+      <h1>Intro Page</h1>
+      {/* stuff */}
     </div>
   );
 }
