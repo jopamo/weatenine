@@ -68,6 +68,10 @@ button {
   transition: background-color 0.3s;
 }
 
+.button-spacing {
+  margin-right: 10px;
+}
+
 button:hover {
   background-color: #0056b3;
 }
@@ -101,3 +105,4 @@ table th {
 body {
   background-color: #121212;
 }
+

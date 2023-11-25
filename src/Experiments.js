@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PAINT_ONCE } from './paintTools';
+import './App.css';
 
-function Experiments() {
+function Experiments({ setCurrentPage }) {
+  const handleReturnToApp = () => {
+    setCurrentPage("app");
+  };
+
   const [independentVar, setIndependentVar] = useState("");
   const [values, setValues] = useState("");
   const [fixedY, setFixedY] = useState("");
@@ -63,7 +68,8 @@ function Experiments() {
   return (
     <div>
       <h1>Experiment Setup</h1>
-      <button onClick={handleRunExperiment}>Run Experiments</button>
+      <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
+      <button onClick={handleReturnToApp}>Return to Simulation</button>
       {errorMessage && <p>Error: {errorMessage}</p>}
       <div>
         <h2>Results</h2>
