@@ -1,27 +1,33 @@
+// Import necessary hooks and components from React and other files
 import React, { useState, useEffect, useCallback } from 'react';
 import { PAINT_ONCE } from './paintTools';
-import './App.css';
+import './App.css'; // Importing CSS for styling
 
+// Define the Experiments component. It receives 'setCurrentPage' as a prop for navigation
 function Experiments({ setCurrentPage }) {
+  // A function to handle returning to the main app. It changes the current page using 'setCurrentPage'
   const handleReturnToApp = () => {
     setCurrentPage("app");
   };
 
-  const [independentVar, setIndependentVar] = useState("");
-  const [values, setValues] = useState("");
-  const [fixedY, setFixedY] = useState("");
-  const [fixedR, setFixedR] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [results, setResults] = useState([]);
+  // State variables for the component.
+  const [independentVar, setIndependentVar] = useState(""); // Tracks the independent variable for experiments
+  const [values, setValues] = useState(""); // Stores the values entered by the user
+  const [fixedY, setFixedY] = useState(""); // Stores a fixed value for Y dimension
+  const [fixedR, setFixedR] = useState(""); // Stores a fixed value for R (radius or another variable)
+  const [errorMessage, setErrorMessage] = useState(""); // To display any error messages
+  const [results, setResults] = useState([]); // Array to store the results of experiments
 
+  // Function to handle running an experiment. Wrapped in 'useCallback' to prevent unnecessary re-renders
   const handleRunExperiment = useCallback(() => {
-    setResults([]); // reset results
+    setResults([]); // Reset results before running a new experiment
 
-    const inputValues = values.split(',').map(Number);
+    const inputValues = values.split(',').map(Number); // Convert the entered values to an array of numbers
 
+    // Process each value to run the experiment
     inputValues.forEach(value => {
       let X, Y, R;
-      const statistics = {
+      const counts = {
         totalColor1: 0,
         totalColor2: 0,
         totalColor3: 0,
@@ -29,42 +35,46 @@ function Experiments({ setCurrentPage }) {
         averageTotal: 0,
       };
 
+      // Determine the parameters for the experiment based on the independent variable chosen
       switch (independentVar) {
         case "D":
-          X = Y = value;
+          X = Y = value; // For 'D' case, set both X and Y to the input value
           R = parseInt(fixedR, 10);
           break;
         case "X":
-          X = value;
+          X = value; // Set X to the input value and Y to a fixed value
           Y = parseInt(fixedY, 10);
           R = parseInt(fixedR, 10);
           break;
         case "R":
-          X = Y = parseInt(values, 10); // square canvas for R
+          X = Y = parseInt(values, 10); // For 'R', assuming a square canvas and setting both X and Y
           R = value;
           break;
         default:
-          setErrorMessage("Invalid independent variable");
+          setErrorMessage("Invalid independent variable"); // Set error message if the variable is invalid
           return;
       }
 
-      const experimentResult = PAINT_ONCE(X, Y, 'C1', 'C2', 'C3', 'allMixedColors', statistics);
+      // Run the paint experiment with the determined parameters
+      const experimentResult = PAINT_ONCE(X, Y, 'C1', 'C2', 'C3', 'allMixedColors', counts);
 
+      // Add the result of the experiment to the results array
       setResults(prevResults => [...prevResults, { X, Y, R, ...experimentResult }]);
     });
 
-    setErrorMessage(""); // clear errors
-  }, [values, independentVar, fixedY, fixedR]); // deps
+    setErrorMessage(""); // Clear any error messages after running the experiment
+  }, [values, independentVar, fixedY, fixedR]); // Dependencies for useCallback
 
+  // useEffect to set default values and run the experiment when the component mounts
   useEffect(() => {
-    // defaults
     setIndependentVar("D");
     setValues("10");
     setFixedY("10");
     setFixedR("1");
     handleRunExperiment();
-  }, [handleRunExperiment]); // dep
+  }, [handleRunExperiment]); // Dependency array
 
+  // Render the component
   return (
     <div>
       <h1>Experiment Setup</h1>
@@ -73,18 +83,20 @@ function Experiments({ setCurrentPage }) {
       {errorMessage && <p>Error: {errorMessage}</p>}
       <div>
         <h2>Results</h2>
+        {/* Map through the results array to display each experiment's result. */}
         {results.map((result, index) => (
           <div key={index}>
             <p>Experiment {index + 1}:</p>
+            {/* Display details of the experiment result. */}
             <p>X: {result.X}, Y: {result.Y}, R: {result.R}</p>
             <p>Count: {result.count}</p>
             <p>Painted Cells: {result.paintedCells}</p>
             <p>Stopping Criterion (S): {result.S}</p>
-            <p>Total Color 1 Drops: {result.statistics.totalColor1}</p>
-            <p>Total Color 2 Drops: {result.statistics.totalColor2}</p>
-            <p>Total Color 3 Drops: {result.statistics.totalColor3}</p>
-            <p>Square with Most Drops: {result.statistics.squareMostDrops}</p>
-            <p>Average Drops Per Square: {result.statistics.averageTotal}</p>
+            <p>Total Color 1 Drops: {result.counts.totalColor1}</p>
+            <p>Total Color 2 Drops: {result.counts.totalColor2}</p>
+            <p>Total Color 3 Drops: {result.counts.totalColor3}</p>
+            <p>Square with Most Drops: {result.counts.squareMostDrops}</p>
+            <p>Average Drops Per Square: {result.counts.averageTotal}</p>
           </div>
         ))}
       </div>
