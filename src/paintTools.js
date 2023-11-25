@@ -28,7 +28,8 @@ export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, c
       // Check if every cell in every row of the grid has been painted at least once
       // grid.every(...) checks each row, and row.every(...) checks each cell in the row
       const lastUnpainted = grid.every(row => row.every(cell => cell.color !== null));
-      // Return an object indicating if this criterion is met (true/false) and the associated message
+      // Return an object indicating if this criterion is met (true/false) and the
+      // associated message
       return {
         met: lastUnpainted,
         message: 'Stopped: All squares have been painted at least once.'
@@ -48,9 +49,11 @@ export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, c
     // Criterion: Stop when all squares have mixed colors
     case 'allMixedColors':
       // Check if every cell in every row of the grid has a mixed color
-      // A mixed color is defined as a color that is not one of the original three colors (color1, color2, color3)
+      // A mixed color is defined as a color that is not one of the original
+      // three colors (color1, color2, color3)
       const allPainted = grid.every(row => row.every(cell => cell.color !== null && ![color1, color2, color3].includes(cell.color)));
-      // Return an object indicating if all squares are filled with mixed colors and the associated message
+      // Return an object indicating if all squares are filled with mixed colors
+      // and the associated message
       return {
         met: allPainted,
         message: 'Stopped: The entire board is filled with mixed colors.'
@@ -87,9 +90,9 @@ export const initializeGrid = (xDimension, yDimension) => {
 
 // Paint a random cell in a grid with one of the provided colors
 export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, counts) => {
-  // Select a random x-coordinate within the grid. Math.random() generates a number between 0 (inclusive) and 1 (exclusive)
+  // Select a random x-coordinate within the grid. Math.random()
+  // generates a number between 0 (inclusive) and 1 (exclusive)
   // Multiplying by xDimension scales this to the grid width, and
-  // https://github.com/jopamo/weatenine/tree/main/src
   // Math.floor() rounds down to get an integer cell index
   const x = Math.floor(Math.random() * xDimension);
 
@@ -115,7 +118,8 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   grid[y][x].count++;
 
   // Update counts for each color drop
-  // If the chosen color matches one of the original colors (color1, color2, color3), increment the corresponding total color count
+  // If the chosen color matches one of the original colors
+  // color1, color2, color3), increment the corresponding total color count
   counts.totalColor1 += chosenColor === color1 ? 1 : 0;
   counts.totalColor2 += chosenColor === color2 ? 1 : 0;
   counts.totalColor3 += chosenColor === color3 ? 1 : 0;
@@ -147,7 +151,8 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
   let count = 0;
 
   // Initialize a 'Set' to track unique painted cells on the grid.
-  // 'Set' is used here because it automatically handles uniqueness, ensuring each cell is tracked only once
+  // 'Set' is used here because it automatically handles uniqueness,
+  // ensuring each cell is tracked only once
   let paintedCellsTracker = new Set();
 
   // continue until a stopping criterion is met.
@@ -156,7 +161,8 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
     count++;
 
     // Execute the paintRandomCell function, which paints a random cell on the grid
-    // and returns an object containing the updated grid and counts, and the coordinates of the painted cell
+    // and returns an object containing the updated grid and counts, and the
+    // coordinates of the painted cell
     // The returned object is destructured to extract:
     // - updatedGrid: the new state of the grid after painting the cell.
     // - newCounts: updated painting counts after the cell is painted.

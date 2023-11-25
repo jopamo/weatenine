@@ -11,18 +11,22 @@ function Experiments({ setCurrentPage }) {
   };
 
   // State variables for the component.
-  const [independentVar, setIndependentVar] = useState(""); // Tracks the independent variable for experiments
+  // Tracks the independent variable for experiments
+  const [independentVar, setIndependentVar] = useState("");
   const [values, setValues] = useState(""); // Stores the values entered by the user
   const [fixedY, setFixedY] = useState(""); // Stores a fixed value for Y dimension
-  const [fixedR, setFixedR] = useState(""); // Stores a fixed value for R (radius or another variable)
+  // Stores a fixed value for R (radius or another variable)
+  const [fixedR, setFixedR] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // To display any error messages
   const [results, setResults] = useState([]); // Array to store the results of experiments
 
-  // Function to handle running an experiment. Wrapped in 'useCallback' to prevent unnecessary re-renders
+  // Function to handle running an experiment. Wrapped in 'useCallback'
+  // to prevent unnecessary re-renders
   const handleRunExperiment = useCallback(() => {
     setResults([]); // Reset results before running a new experiment
 
-    const inputValues = values.split(',').map(Number); // Convert the entered values to an array of numbers
+    // Convert the entered values to an array of numbers
+    const inputValues = values.split(',').map(Number);
 
     // Process each value to run the experiment
     inputValues.forEach(value => {
@@ -47,11 +51,13 @@ function Experiments({ setCurrentPage }) {
           R = parseInt(fixedR, 10);
           break;
         case "R":
-          X = Y = parseInt(values, 10); // For 'R', assuming a square canvas and setting both X and Y
+          // For 'R', assuming a square canvas and setting both X and Y
+          X = Y = parseInt(values, 10);
           R = value;
           break;
         default:
-          setErrorMessage("Invalid independent variable"); // Set error message if the variable is invalid
+          // Set error message if the variable is invalid
+          setErrorMessage("Invalid independent variable");
           return;
       }
 

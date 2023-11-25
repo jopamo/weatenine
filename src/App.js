@@ -3,40 +3,78 @@ import './App.css';
 import { checkStoppingCriteria, paintRandomCell } from './paintTools';
 
 function App({ setCurrentPage }) {
- function debounce(fn, ms) {
+  // Define a debounce function to limit the rate at which a function can fire
+  function debounce(fn, ms) {
+    // Declare a variable 'timer' to keep track of the setTimeout
     let timer;
+
+    // Return a new function that will be the actual debounced function
     return _ => {
+      // Clear any existing timeout to reset the timer.
+      // This prevents the previous function call from executing if it's within the timeout period
       clearTimeout(timer);
+
+      // Set a new timeout. The original function 'fn' will be called after 'ms' milliseconds
+      // if this returned function is not called again during that time
       timer = setTimeout(_ => {
+        // Reset the timer to null once the delay is over
         timer = null;
+
+        // Call the original function 'fn' with the context 'this' and any arguments passed
+        // 'apply' is used to call 'fn' with the context 'this' and an array-like object 'arguments'
         fn.apply(this, arguments);
       }, ms);
     };
   }
 
+
+   // Define a function to calculate the initial dimensions for the grid based on the window size
   const calculateInitialDimensions = () => {
+    // Get the inner width of the window (the width of the viewport)
     const width = window.innerWidth;
+
+    // Determine if the current device is a mobile device based on the width
+    // Consider it a mobile device if the width is less than 768 pixels
     const isMobile = width < 768;
 
+    // Calculate the xDimension (number of cells horizontally) for the grid
+    // If it's a mobile device, set xDimension to 10
+    // For non-mobile devices, calculate it based on the width of the window:
+    // Divide the window width by 50 to get the number of cells, but limit it to a maximum of 25 cells
     const xDimension = isMobile ? 10 : Math.min(Math.floor(width / 50), 25);
+
+    // Calculate the yDimension (number of cells vertically) for the grid.
+    // Similar to xDimension, but using the window's inner height for the calculation
+    // If it's a mobile device, set yDimension to 10.
+    // For non-mobile devices, divide the window height by 50 for the number of cells
+    // with a maximum limit of 25 cells.
     const yDimension = isMobile ? 10 : Math.min(Math.floor(window.innerHeight / 50), 25);
 
-
+    // Return an object containing the calculated dimensions (xDimension and yDimension)
     return { xDimension, yDimension };
   };
 
-  const { xDimension: initialXDimension, yDimension: initialYDimension } = calculateInitialDimensions();
+  // Retrieve initial dimensions for the grid from calculateInitialDimensions function
+  const {
+    xDimension: initialXDimension,
+    yDimension: initialYDimension
+  } = calculateInitialDimensions();
 
+  // xDimension and yDimension using the initial values obtained
   const [xDimension, setXDimension] = useState(initialXDimension);
   const [yDimension, setYDimension] = useState(initialYDimension);
 
+  // Handle the continue action, transitioning to the 'experiments' page
   const handleContinue = () => {
     setCurrentPage('experiments');
   };
 
-  const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
+  // useRef hooks to keep references to the canvas and its drawing context
+  const canvasRef = useRef(null); // Ref for the canvas element
+  const ctxRef = useRef(null); // Ref for the canvas's 2D drawing context
 
+  // Object to map color values to human-readable color names
+  // Each property is a color in RGB format mapped to its name
   const colorOptions = {
     'rgb(255,0,0)': 'Red',
     'rgb(0,255,0)': 'Green',
@@ -48,54 +86,115 @@ function App({ setCurrentPage }) {
     'rgb(0,128,128)': 'Teal'
   };
 
-  // default values
+  // State for managing the selected colors
   const [color1, setColor1] = useState('rgb(255,0,0)');
   const [color2, setColor2] = useState('rgb(0,255,0)');
   const [color3, setColor3] = useState('rgb(0,0,255)');
 
+  // State for managing the stopping criterion and its message
   const [stoppingCriterion, setStoppingCriterion] = useState('allMixedColors');
   const [stoppingCriteriaMessage, setStoppingCriteriaMessage] = useState('');
 
-  // grid's data structure: a 2D array representing color and how many paint drops.
+  // State for the grid data structure. It's a 2D array representing the grid cells
   const [grid, setGrid] = useState([]);
 
-  // flag indicating whether random painting is currently occurring
+  // State to track whether the painting process is active
   const [isPainting, setIsPainting] = useState(false);
 
+  // State for managing the speed at which paint drops are applied
   const [dropSpeed, setDropSpeed] = useState(10);
 
+  // Render color options in the UI, excluding chosen colors
   const renderColorOptions = (excludeColors) => {
     return Object.entries(colorOptions)
-      .filter(([colorValue]) => !excludeColors.includes(colorValue))
+      .filter(([colorValue]) => !excludeColors.includes(colorValue)) // Exclude specified colors
       .map(([colorValue, colorName]) => (
-        <option key={colorValue} value={colorValue}>{colorName}</option>
+        <option key={colorValue} value={colorValue}>{colorName}</option> // Render each color option
       ));
   };
 
+  // Define the 'updateStoppingCriteria' function wrapped with the 'useCallback' hook
+  // 'useCallback' will return a memoized version of the callback that only changes
+  // if one of the dependencies has changed
   const updateStoppingCriteria = useCallback(() => {
+
+    // Call 'checkStoppingCriteria' function, passing the current state of the
+    // grid, the selected stopping criterion, and the three colors
+    // This function checks if the stopping condition for painting is met
+    // based on the current state of the grid and the selected criterion
     const result = checkStoppingCriteria(grid, stoppingCriterion, color1, color2, color3);
 
+    // Check if the stopping criterion is met, which is indicated by the 'met'
+    // property of the result
     if (result.met) {
+      // If the criterion is met, stop the painting process by setting
+      // 'isPainting' state to false
       setIsPainting(false);
+
+      // Update the 'stoppingCriteriaMessage' state with the message indicating
+      // why the painting process stopped
+      // This message is part of the 'result' object returned from
+      // 'checkStoppingCriteria'
       setStoppingCriteriaMessage(result.message);
     }
-  }, [grid, stoppingCriterion, color1, color2, color3]);
+  },
+  // List of dependencies for the useCallback hook. The callback function will
+  // only change if any of these values change
+  [grid, stoppingCriterion, color1, color2, color3]
+);
 
-  // Draw a single cell onto canvas
+
+  // This is the callback function provided to 'useCallback'. It takes four parameters:
+  // ctx: The canvas rendering context where the cell will be drawn
+  // x: The x-coordinate of the cell on the grid
+  // y: The y-coordinate of the cell on the grid
+  // color: The color to fill the cell with
   const drawCell = useCallback((ctx, x, y, color) => {
+    // Set the fill style of the context to the specified color
     ctx.fillStyle = color;
+
+    // Draw a filled rectangle (the cell) on the canvas at the specified coordinates
+    // The rectangle starts at (x * 20, y * 20) and has a size of 20x20 pixels
+    // The multiplication by 20 scales the grid coordinates to canvas coordinates
     ctx.fillRect(x * 20, y * 20, 20, 20);
   }, []); // Empty dependency array since drawCell doesn't depend on external values
 
-  // Function to draw the entire grid
-  const drawGrid = useCallback(() => {
-    const ctx = ctxRef.current;
-    grid.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        drawCell(ctx, x, y, cell.color || 'grey');
-    });
-  });
-}, [grid, ctxRef, drawCell]);
+  // Draw the entire grid
+  const drawGrid = useCallback(
+    // This is the callback function provided to 'useCallback'. It does not take parameters
+    () => {
+      // Retrieve the current canvas context stored in 'ctxRef'.
+      // 'ctxRef' is a ref object that persists for the lifetime of the component
+      // and provides access to the canvas context
+      const ctx = ctxRef.current;
+
+      // Iterate over each row in the grid.
+      // 'grid' is a 2D array representing the grid of cells
+      // 'y' is the index of the current row in the grid
+      grid.forEach((row, y) => {
+
+        // Iterate over each cell in the current row
+        // 'x' is the index of the current cell in the row
+        row.forEach((cell, x) => {
+
+          // Call 'drawCell' to draw the current cell
+          // 'ctx' is the canvas context.
+          // 'x' and 'y' are the coordinates of the cell
+          // 'cell.color || 'grey'' determines the color to use for the cell:
+          //   If 'cell.color' is defined, use it; otherwise, default to 'grey'
+          drawCell(ctx, x, y, cell.color || 'grey');
+        });
+      });
+    },
+
+    // The dependency array for useCallback
+    // The function will be recreated if any of these dependencies change:
+    // - 'grid': The data structure representing the grid of cells
+    // - 'ctxRef': The ref object pointing to the canvas context
+    // - 'drawCell': The function used to draw individual cells
+    [grid, ctxRef, drawCell]
+  );
+
 
   // Set up the canvas and its context
   useEffect(() => {
@@ -106,7 +205,7 @@ function App({ setCurrentPage }) {
     drawGrid();
   }, [xDimension, yDimension, drawGrid]);
 
-  // When grid dimensions change, we generate a new empty grid with the new dimensions.
+  // When grid dimensions change, we generate a new empty grid with the new dimensions
   useEffect(() => {
     if (xDimension && yDimension) {
       const newGrid = Array.from({ length: yDimension }, () => Array.from({ length: xDimension }, () => ({ color: null, count: 0 })));
@@ -132,8 +231,11 @@ function App({ setCurrentPage }) {
 
   const resetBoardAndCounts = useCallback(() => {
     const newGrid = Array.from({ length: yDimension }, () =>
-      Array.from({ length: xDimension }, () => ({ color: null, count: 0 }))
-    );
+      Array.from({ length: xDimension }, () =>
+        ({ color: null, count: 0 })
+      )
+  );
+
     setGrid(newGrid);
     resetColorCounts();
 
@@ -154,7 +256,10 @@ function App({ setCurrentPage }) {
 
   useEffect(() => {
     const debouncedHandleResize = debounce(() => {
-      const { xDimension: newXDimension, yDimension: newYDimension } = calculateInitialDimensions();
+      const {
+        xDimension: newXDimension,
+        yDimension: newYDimension
+      } = calculateInitialDimensions();
 
       if (newXDimension !== xDimension || newYDimension !== yDimension) {
         stopPaintingAndReset();
@@ -171,13 +276,18 @@ function App({ setCurrentPage }) {
   }, [xDimension, yDimension, stopPaintingAndReset]);
 
   const handlePaintRandomCell = useCallback(() => {
-  if (xDimension === 0 || yDimension === 0) return;
+    if (xDimension === 0 || yDimension === 0) return;
 
-  const { grid: updatedGrid, counts: updatedCounts, paintedCell } = paintRandomCell(grid, xDimension, yDimension, color1, color2, color3, colorCounts);
+    const {
+      grid: updatedGrid,
+      counts: updatedCounts,
+      paintedCell
+    } = paintRandomCell(grid, xDimension, yDimension, color1, color2, color3, colorCounts);
 
-  setGrid(updatedGrid);
 
-  setColorCounts(prevCounts => {
+    setGrid(updatedGrid);
+
+    setColorCounts(prevCounts => {
     // Increment only by the amount returned by paintRandomCell for the specific color
     return {
       totalColor1: prevCounts.totalColor1 + (updatedCounts.totalColor1 - colorCounts.totalColor1),
