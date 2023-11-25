@@ -19,6 +19,7 @@ export const mixColors = (colorA, colorB) => {
   return `rgb(${r},${g},${b})`;
 };
 
+
 // Check whether a stopping criterion for painting is met
 export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, color3) => {
   switch (stoppingCriterion) {
@@ -83,22 +84,29 @@ export const initializeGrid = (xDimension, yDimension) => {
   );
 };
 
+
 // Paint a random cell in a grid with one of the provided colors
 export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, counts) => {
   // Select a random x-coordinate within the grid. Math.random() generates a number between 0 (inclusive) and 1 (exclusive)
-  // Multiplying by xDimension scales this to the grid width, and Math.floor() rounds down to get an integer cell index
+  // Multiplying by xDimension scales this to the grid width, and
+  // https://github.com/jopamo/weatenine/tree/main/src
+  // Math.floor() rounds down to get an integer cell index
   const x = Math.floor(Math.random() * xDimension);
 
   // Select a random y-coordinate within the grid, similar to the x-coordinate selection
   const y = Math.floor(Math.random() * yDimension);
 
   // Choose one of the three provided colors randomly.
-  // Math.random() * 3 generates a number between 0 and 3, and Math.floor() converts it to an integer (0, 1, or 2)
-  // This integer is used to select from the array [color1, color2, color3]
+  // Math.random() * 3 generates a number between 0 and 3, and Math.floor()
+  // converts it to an integer (0, 1, or 2). This integer is used to select
+  // from the array [color1, color2, color3]
   const chosenColor = [color1, color2, color3][Math.floor(Math.random() * 3)];
 
   // blends two colors. The existing color of the cell and the chosen color are passed to it
   const mixedColor = mixColors(grid[y][x].color, chosenColor);
+
+  console.log('Chosen color:', chosenColor);
+  console.log('Counts before update:', counts);
 
   // Update the color of the cell in the grid to the new mixed color
   grid[y][x].color = mixedColor;
@@ -123,8 +131,10 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
     counts.squareMostDropsLocation = { x, y };
   }
 
+  console.log('Counts after update:', counts);
+
   // Return the updated grid and counts, along with the coordinates of the painted cell
-  return { grid, counts, paintedCell: { x, y } };
+  return { grid, counts, paintedCell: { x, y }, chosenColor };
 };
 
 

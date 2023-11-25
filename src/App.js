@@ -1,79 +1,42 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './App.css';
-import { mixColors } from './paintTools';
-import { checkStoppingCriteria } from './paintTools';
+import { checkStoppingCriteria, paintRandomCell } from './paintTools';
 
 function App({ setCurrentPage }) {
-  // Define a debounce function to limit the rate at which a function can fire
-  function debounce(fn, ms) {
-    // Declare a variable 'timer' to keep track of the setTimeout
+ function debounce(fn, ms) {
     let timer;
-
-    // Return a new function that will be the actual debounced function
     return _ => {
-      // Clear any existing timeout to reset the timer.
-      // This prevents the previous function call from executing if it's within the timeout period
       clearTimeout(timer);
-
-      // Set a new timeout. The original function 'fn' will be called after 'ms' milliseconds
-      // if this returned function is not called again during that time
       timer = setTimeout(_ => {
-        // Reset the timer to null once the delay is over
         timer = null;
-
-        // Call the original function 'fn' with the context 'this' and any arguments passed
-        // 'apply' is used to call 'fn' with the context 'this' and an array-like object 'arguments'
         fn.apply(this, arguments);
       }, ms);
     };
   }
 
-
-  // Define a function to calculate the initial dimensions for the grid based on the window size
   const calculateInitialDimensions = () => {
-    // Get the inner width of the window (the width of the viewport)
     const width = window.innerWidth;
-
-    // Determine if the current device is a mobile device based on the width
-    // Consider it a mobile device if the width is less than 768 pixels
     const isMobile = width < 768;
 
-    // Calculate the xDimension (number of cells horizontally) for the grid
-    // If it's a mobile device, set xDimension to 10
-    // For non-mobile devices, calculate it based on the width of the window:
-    // Divide the window width by 50 to get the number of cells, but limit it to a maximum of 25 cells
     const xDimension = isMobile ? 10 : Math.min(Math.floor(width / 50), 25);
-
-    // Calculate the yDimension (number of cells vertically) for the grid.
-    // Similar to xDimension, but using the window's inner height for the calculation
-    // If it's a mobile device, set yDimension to 10.
-    // For non-mobile devices, divide the window height by 50 for the number of cells
-    // with a maximum limit of 25 cells.
     const yDimension = isMobile ? 10 : Math.min(Math.floor(window.innerHeight / 50), 25);
 
-    // Return an object containing the calculated dimensions (xDimension and yDimension)
+
     return { xDimension, yDimension };
   };
 
-
-  // Retrieve initial dimensions for the grid from calculateInitialDimensions function
   const { xDimension: initialXDimension, yDimension: initialYDimension } = calculateInitialDimensions();
 
-  // xDimension and yDimension using the initial values obtained
   const [xDimension, setXDimension] = useState(initialXDimension);
   const [yDimension, setYDimension] = useState(initialYDimension);
 
-  // Handle the continue action, transitioning to the 'experiments' page
   const handleContinue = () => {
     setCurrentPage('experiments');
   };
 
-  // useRef hooks to keep references to the canvas and its drawing context
-  const canvasRef = useRef(null); // Ref for the canvas element
-  const ctxRef = useRef(null); // Ref for the canvas's 2D drawing context
+  const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
 
-  // Object to map color values to human-readable color names
-  // Each property is a color in RGB format mapped to its name
   const colorOptions = {
     'rgb(255,0,0)': 'Red',
     'rgb(0,255,0)': 'Green',
@@ -85,68 +48,65 @@ function App({ setCurrentPage }) {
     'rgb(0,128,128)': 'Teal'
   };
 
-  // State for managing the selected colors
+  // default values
   const [color1, setColor1] = useState('rgb(255,0,0)');
   const [color2, setColor2] = useState('rgb(0,255,0)');
   const [color3, setColor3] = useState('rgb(0,0,255)');
 
-  // State for managing the stopping criterion and its message
   const [stoppingCriterion, setStoppingCriterion] = useState('allMixedColors');
   const [stoppingCriteriaMessage, setStoppingCriteriaMessage] = useState('');
 
-  // State for the grid data structure. It's a 2D array representing the grid cells
+  // grid's data structure: a 2D array representing color and how many paint drops.
   const [grid, setGrid] = useState([]);
 
-  // State to track whether the painting process is active
+  // flag indicating whether random painting is currently occurring
   const [isPainting, setIsPainting] = useState(false);
 
-  // State for managing the speed at which paint drops are applied
   const [dropSpeed, setDropSpeed] = useState(10);
 
-  // Render color options in the UI, excluding certain colors
   const renderColorOptions = (excludeColors) => {
     return Object.entries(colorOptions)
-      .filter(([colorValue]) => !excludeColors.includes(colorValue)) // Exclude specified colors
+      .filter(([colorValue]) => !excludeColors.includes(colorValue))
       .map(([colorValue, colorName]) => (
-        <option key={colorValue} value={colorValue}>{colorName}</option> // Render each color option
+        <option key={colorValue} value={colorValue}>{colorName}</option>
       ));
   };
 
-  // Update stopping criteria, wrapped with useCallback for performance optimization
   const updateStoppingCriteria = useCallback(() => {
     const result = checkStoppingCriteria(grid, stoppingCriterion, color1, color2, color3);
+
     if (result.met) {
-      setIsPainting(false); // Stop painting if the criterion is met
-      setStoppingCriteriaMessage(result.message); // Update the message indicating why painting stopped
+      setIsPainting(false);
+      setStoppingCriteriaMessage(result.message);
     }
   }, [grid, stoppingCriterion, color1, color2, color3]);
 
-  // Draw the entire grid, wrapped with useCallback
+  // Draw a single cell onto canvas
+  const drawCell = useCallback((ctx, x, y, color) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * 20, y * 20, 20, 20);
+  }, []); // Empty dependency array since drawCell doesn't depend on external values
+
+  // Function to draw the entire grid
   const drawGrid = useCallback(() => {
-    const ctx = ctxRef.current; // Access the canvas context
+    const ctx = ctxRef.current;
     grid.forEach((row, y) => {
       row.forEach((cell, x) => {
-        drawCell(ctx, x, y, cell.color || 'grey'); // Draw each cell
-      });
+        drawCell(ctx, x, y, cell.color || 'grey');
     });
-  }, [grid, ctxRef]);
+  });
+}, [grid, ctxRef, drawCell]);
 
-  // useEffect hook for setting up the canvas and its context.
+  // Set up the canvas and its context
   useEffect(() => {
     const canvas = canvasRef.current;
-    ctxRef.current = canvas.getContext('2d'); // Set the context reference.
-    canvas.width = xDimension * 20; // Set canvas width based on the grid dimensions.
-    canvas.height = yDimension * 20; // Set canvas height.
-    drawGrid(); // Draw the initial grid.
+    ctxRef.current = canvas.getContext('2d');
+    canvas.width = xDimension * 20; // Assuming each cell is 20x20 pixels
+    canvas.height = yDimension * 20;
+    drawGrid();
   }, [xDimension, yDimension, drawGrid]);
 
-  // Draw a single cell on the canvas.
-  const drawCell = (ctx, x, y, color) => {
-    ctx.fillStyle = color; // Set the color to fill the cell
-    ctx.fillRect(x * 20, y * 20, 20, 20); // Draw the cell at the specified coordinates
-  };
-
-  // When grid dimensions change, we generate a new empty grid with the new dimensions
+  // When grid dimensions change, we generate a new empty grid with the new dimensions.
   useEffect(() => {
     if (xDimension && yDimension) {
       const newGrid = Array.from({ length: yDimension }, () => Array.from({ length: xDimension }, () => ({ color: null, count: 0 })));
@@ -158,10 +118,11 @@ function App({ setCurrentPage }) {
     document.title = "weatenine"
   }, []);
 
-  const initialColorCounts = Object.keys(colorOptions).reduce((acc, color) => {
-    acc[color] = 0;
-    return acc;
-  }, {});
+  const initialColorCounts = useMemo(() => ({
+    totalColor1: 0,
+    totalColor2: 0,
+    totalColor3: 0
+  }), []);
 
   const [colorCounts, setColorCounts] = useState(initialColorCounts);
 
@@ -209,40 +170,41 @@ function App({ setCurrentPage }) {
     };
   }, [xDimension, yDimension, stopPaintingAndReset]);
 
-  // Chooses a random cell and a random color to paint that cell
-  // Define paintRandomCell using useCallback
-  const paintRandomCell = useCallback(() => {
-    if (xDimension === 0 || yDimension === 0) return;
+  const handlePaintRandomCell = useCallback(() => {
+  if (xDimension === 0 || yDimension === 0) return;
 
-    const x = Math.floor(Math.random() * xDimension);
-    const y = Math.floor(Math.random() * yDimension);
-    const chosenColor = [color1, color2, color3][Math.floor(Math.random() * 3)];
+  const { grid: updatedGrid, counts: updatedCounts, paintedCell } = paintRandomCell(grid, xDimension, yDimension, color1, color2, color3, colorCounts);
 
-  setGrid((prevGrid) => {
-    const newGrid = prevGrid.map(row => row.map(cell => ({ ...cell })));
-    const mixedColor = mixColors(newGrid[y][x].color, chosenColor);
-    newGrid[y][x].color = mixedColor;
-    newGrid[y][x].count++;
-    drawCell(ctxRef.current, x, y, mixedColor);
-    updateStoppingCriteria(newGrid);
-    return newGrid;
+  setGrid(updatedGrid);
+
+  setColorCounts(prevCounts => {
+    // Increment only by the amount returned by paintRandomCell for the specific color
+    return {
+      totalColor1: prevCounts.totalColor1 + (updatedCounts.totalColor1 - colorCounts.totalColor1),
+      totalColor2: prevCounts.totalColor2 + (updatedCounts.totalColor2 - colorCounts.totalColor2),
+      totalColor3: prevCounts.totalColor3 + (updatedCounts.totalColor3 - colorCounts.totalColor3),
+      squareMostDrops: Math.max(prevCounts.squareMostDrops, updatedCounts.squareMostDrops)
+    };
   });
 
-  setColorCounts((prevCounts) => ({
-    ...prevCounts,
-    [chosenColor]: prevCounts[chosenColor] + 1
-  }));
-}, [xDimension, yDimension, color1, color2, color3, setGrid, setColorCounts, updateStoppingCriteria]);
+  drawCell(ctxRef.current, paintedCell.x, paintedCell.y, updatedGrid[paintedCell.y][paintedCell.x].color);
+
+  updateStoppingCriteria(updatedGrid);
+}, [grid, xDimension, yDimension, color1, color2, color3, colorCounts, setGrid, setColorCounts, drawCell, updateStoppingCriteria]);
+
+  useEffect(() => {
+    //console.log('Current colorCounts state:', colorCounts);
+  }, [colorCounts]);
 
   useEffect(() => {
     if (!isPainting) return;
 
     const interval = setInterval(() => {
-      paintRandomCell();
+      handlePaintRandomCell();
     }, 1000 / dropSpeed);
 
     return () => clearInterval(interval);
-  }, [isPainting, paintRandomCell, dropSpeed]);
+  }, [isPainting, handlePaintRandomCell, dropSpeed]);
 
   // Starts painting
   const handleSubmit = (e) => {
@@ -252,7 +214,6 @@ function App({ setCurrentPage }) {
       alert("Dimensions cannot be negative or zero!");
       return;
     }
-
     startPainting();
   };
 
@@ -261,11 +222,9 @@ function App({ setCurrentPage }) {
       alert("Dimensions cannot be negative or zero!");
       return;
     }
-
     if (isPainting) {
       resetBoardAndCounts();
     }
-
     console.log("Starting painting");
     setIsPainting(true);
   };
@@ -369,14 +328,18 @@ return (
           </tr>
         </thead>
         <tbody>
-          {Object.entries(colorCounts)
-            .filter(([color]) => [color1, color2, color3].includes(color))
-            .map(([color, count]) => (
-              <tr key={color}>
-                <td style={{ backgroundColor: color, width: '50px', height: '20px' }}></td>
-                <td>{count}</td>
-              </tr>
-          ))}
+          <tr>
+            <td style={{ backgroundColor: color1, width: '50px', height: '20px' }}></td>
+            <td>{colorCounts.totalColor1}</td>
+          </tr>
+          <tr>
+            <td style={{ backgroundColor: color2, width: '50px', height: '20px' }}></td>
+            <td>{colorCounts.totalColor2}</td>
+          </tr>
+          <tr>
+            <td style={{ backgroundColor: color3, width: '50px', height: '20px' }}></td>
+            <td>{colorCounts.totalColor3}</td>
+          </tr>
         </tbody>
       </table>
     </div>
