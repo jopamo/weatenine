@@ -1,6 +1,17 @@
 // Converts string "rgb(255,0,0)" to an array [255, 0, 0].
 const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
 
+const isMixedColor = (color, originalColors) => {
+  // Get RGB values of the color to check
+  const colorRGB = rgbStringToArray(color);
+
+  // Compare with each original color
+  return originalColors.every(originalColor => {
+    const originalRGB = rgbStringToArray(originalColor);
+    return !originalRGB.every((value, index) => value === colorRGB[index]);
+  });
+};
+
 // Calculate mix of two colors
 export const mixColors = (colorA, colorB) => {
   if (!colorA) return colorB; // If no colorA, return colorB
@@ -48,12 +59,14 @@ export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, c
 
     // Criterion: Stop when all squares have mixed colors
     case 'allMixedColors':
-      // Check if every cell in every row of the grid has a mixed color
-      // A mixed color is defined as a color that is not one of the original
-      // three colors (color1, color2, color3)
-      const allPainted = grid.every(row => row.every(cell => cell.color !== null && ![color1, color2, color3].includes(cell.color)));
-      // Return an object indicating if all squares are filled with mixed colors
-      // and the associated message
+      const originalColors = [color1, color2, color3];
+      const allPainted = grid.every(row =>
+        row.every(cell =>
+          cell.color !== null &&
+          isMixedColor(cell.color, originalColors)
+        )
+      );
+
       return {
         met: allPainted,
         message: 'Stopped: The entire board is filled with mixed colors.'
@@ -109,6 +122,7 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   const mixedColor = mixColors(grid[y][x].color, chosenColor);
 
   // Update the color of the cell in the grid to the new mixed color
+  console.log(`Painting cell at [${x}, ${y}] with color ${chosenColor}`);
   grid[y][x].color = mixedColor;
 
   // Increment the count of how many times the cell has been painted
@@ -144,6 +158,8 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
 
 // simulate painting the grid according to certain rules
 export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
+  console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
+
   // Init a grid based on given dimensions X (width) and Y (height)
   let grid = initializeGrid(X, Y);
 

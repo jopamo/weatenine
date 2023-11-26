@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './App.css';
-import { checkStoppingCriteria, paintRandomCell } from './paintTools';
+import { checkStoppingCriteria, paintRandomCell, initializeGrid } from './paintTools';
 
 function App({ setCurrentPage }) {
+  const paintingIntervalRef = useRef(null);
+  const isPaintingRef = useRef(false);
+
   // Define a debounce function to limit the rate at which a function can fire
   function debounce(fn, ms) {
     // Declare a variable 'timer' to keep track of the setTimeout
@@ -113,37 +116,6 @@ function App({ setCurrentPage }) {
       ));
   };
 
-  // Define the 'updateStoppingCriteria' function wrapped with the 'useCallback' hook
-  // 'useCallback' will return a memoized version of the callback that only changes
-  // if one of the dependencies has changed
-  const updateStoppingCriteria = useCallback(() => {
-
-    // Call 'checkStoppingCriteria' function, passing the current state of the
-    // grid, the selected stopping criterion, and the three colors
-    // This function checks if the stopping condition for painting is met
-    // based on the current state of the grid and the selected criterion
-    const result = checkStoppingCriteria(grid, stoppingCriterion, color1, color2, color3);
-
-    // Check if the stopping criterion is met, which is indicated by the 'met'
-    // property of the result
-    if (result.met) {
-      // If the criterion is met, stop the painting process by setting
-      // 'isPainting' state to false
-      setIsPainting(false);
-
-      // Update the 'stoppingCriteriaMessage' state with the message indicating
-      // why the painting process stopped
-      // This message is part of the 'result' object returned from
-      // 'checkStoppingCriteria'
-      setStoppingCriteriaMessage(result.message);
-    }
-  },
-  // List of dependencies for the useCallback hook. The callback function will
-  // only change if any of these values change
-  [grid, stoppingCriterion, color1, color2, color3]
-);
-
-
   // This is the callback function provided to 'useCallback'. It takes four parameters:
   // ctx: The canvas rendering context where the cell will be drawn
   // x: The x-coordinate of the cell on the grid
@@ -208,7 +180,7 @@ function App({ setCurrentPage }) {
   // When grid dimensions change, we generate a new empty grid with the new dimensions
   useEffect(() => {
     if (xDimension && yDimension) {
-      const newGrid = Array.from({ length: yDimension }, () => Array.from({ length: xDimension }, () => ({ color: null, count: 0 })));
+      const newGrid = initializeGrid(xDimension, yDimension);
       setGrid(newGrid);
     }
   }, [xDimension, yDimension]);
@@ -225,19 +197,16 @@ function App({ setCurrentPage }) {
 
   const [colorCounts, setColorCounts] = useState(initialColorCounts);
 
-  const resetColorCounts = useCallback(() => {
-    setColorCounts(initialColorCounts);
-  }, [initialColorCounts]);
-
   const resetBoardAndCounts = useCallback(() => {
-    const newGrid = Array.from({ length: yDimension }, () =>
-      Array.from({ length: xDimension }, () =>
-        ({ color: null, count: 0 })
-      )
-  );
+    const newGrid = initializeGrid(xDimension, yDimension);
+
 
     setGrid(newGrid);
-    resetColorCounts();
+    setColorCounts({
+      totalColor1: 0,
+      totalColor2: 0,
+      totalColor3: 0
+    });
 
     // Clear the canvas
     const canvas = canvasRef.current;
@@ -247,7 +216,7 @@ function App({ setCurrentPage }) {
 
     // Remove the stop message
     setStoppingCriteriaMessage('');
-  }, [xDimension, yDimension, resetColorCounts]);
+  }, [xDimension, yDimension]);
 
   const stopPaintingAndReset = useCallback(() => {
     setIsPainting(false);
@@ -275,46 +244,48 @@ function App({ setCurrentPage }) {
     };
   }, [xDimension, yDimension, stopPaintingAndReset]);
 
-  const handlePaintRandomCell = useCallback(() => {
-    if (xDimension === 0 || yDimension === 0) return;
+  const paintAndCheck = useCallback(() => {
+    if (!isPaintingRef.current) return; // Add this check
 
+    // Execute the painting function
     const {
       grid: updatedGrid,
       counts: updatedCounts,
       paintedCell
     } = paintRandomCell(grid, xDimension, yDimension, color1, color2, color3, colorCounts);
 
-
+    // Update states based on the painting action
     setGrid(updatedGrid);
 
-    setColorCounts(prevCounts => {
-    // Increment only by the amount returned by paintRandomCell for the specific color
-    return {
-      totalColor1: prevCounts.totalColor1 + (updatedCounts.totalColor1 - colorCounts.totalColor1),
-      totalColor2: prevCounts.totalColor2 + (updatedCounts.totalColor2 - colorCounts.totalColor2),
-      totalColor3: prevCounts.totalColor3 + (updatedCounts.totalColor3 - colorCounts.totalColor3),
+    setColorCounts(prevCounts => ({
+      totalColor1: prevCounts.totalColor1 + (paintedCell.color === color1 ? 1 : 0),
+      totalColor2: prevCounts.totalColor2 + (paintedCell.color === color2 ? 1 : 0),
+      totalColor3: prevCounts.totalColor3 + (paintedCell.color === color3 ? 1 : 0),
       squareMostDrops: Math.max(prevCounts.squareMostDrops, updatedCounts.squareMostDrops)
-    };
-  });
+    }));
 
-  drawCell(ctxRef.current, paintedCell.x, paintedCell.y, updatedGrid[paintedCell.y][paintedCell.x].color);
+    drawCell(ctxRef.current, paintedCell.x, paintedCell.y, updatedGrid[paintedCell.y][paintedCell.x].color);
 
-  updateStoppingCriteria(updatedGrid);
-}, [grid, xDimension, yDimension, color1, color2, color3, colorCounts, setGrid, setColorCounts, drawCell, updateStoppingCriteria]);
-
-  useEffect(() => {
-    //console.log('Current colorCounts state:', colorCounts);
-  }, [colorCounts]);
+    // Check stopping criteria
+    const result = checkStoppingCriteria(updatedGrid, stoppingCriterion, color1, color2, color3);
+    if (result.met) {
+      clearInterval(paintingIntervalRef.current);
+      setIsPainting(false);
+      setStoppingCriteriaMessage(result.message);
+      console.log(`Stopping painting: ${result.message}`);
+      if (!isPainting) return;
+    }
+  }, [grid, xDimension, yDimension, color1, color2, color3, colorCounts, setGrid, setColorCounts, drawCell, stoppingCriterion, isPainting]);
 
   useEffect(() => {
     if (!isPainting) return;
 
-    const interval = setInterval(() => {
-      handlePaintRandomCell();
-    }, 1000 / dropSpeed);
+    // Set the interval to repeatedly call paintAndCheck
+    paintingIntervalRef.current = setInterval(paintAndCheck, 1000 / dropSpeed);
 
-    return () => clearInterval(interval);
-  }, [isPainting, handlePaintRandomCell, dropSpeed]);
+    // Clean up the interval when the component unmounts or conditions change
+    return () => clearInterval(paintingIntervalRef.current);
+  }, [isPainting, paintAndCheck, dropSpeed]);
 
   // Starts painting
   const handleSubmit = (e) => {
@@ -328,14 +299,9 @@ function App({ setCurrentPage }) {
   };
 
   const startPainting = () => {
-    if (xDimension <= 0 || yDimension <= 0) {
-      alert("Dimensions cannot be negative or zero!");
-      return;
-    }
-    if (isPainting) {
-      resetBoardAndCounts();
-    }
+    resetBoardAndCounts();
     console.log("Starting painting");
+    isPaintingRef.current = true;
     setIsPainting(true);
   };
 

@@ -20,6 +20,10 @@ function Experiments({ setCurrentPage }) {
   const [errorMessage, setErrorMessage] = useState(""); // To display any error messages
   const [results, setResults] = useState([]); // Array to store the results of experiments
 
+  const defaultColor1 = "rgb(255, 0, 0)"; // Red
+  const defaultColor2 = "rgb(0, 255, 0)"; // Green
+  const defaultColor3 = "rgb(0, 0, 255)"; // Blue
+
   // Function to handle running an experiment. Wrapped in 'useCallback'
   // to prevent unnecessary re-renders
   const handleRunExperiment = useCallback(() => {
@@ -62,7 +66,7 @@ function Experiments({ setCurrentPage }) {
       }
 
       // Run the paint experiment with the determined parameters
-      const experimentResult = PAINT_ONCE(X, Y, 'C1', 'C2', 'C3', 'allMixedColors', counts);
+      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, 'allMixedColors', counts);
 
       // Add the result of the experiment to the results array
       setResults(prevResults => [...prevResults, { X, Y, R, ...experimentResult }]);
