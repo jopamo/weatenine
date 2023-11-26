@@ -85,7 +85,7 @@ function Experiments({ setCurrentPage }) {
     <div>
       <h1>Experiment Setup</h1>
       <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
-      <button onClick={handleReturnToApp}>Return to Simulation</button>
+      <button onClick={handleReturnToApp}>Return to Canvas</button>
       {errorMessage && <p>Error: {errorMessage}</p>}
       <div>
         <h2>Results</h2>

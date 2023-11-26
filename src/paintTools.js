@@ -108,9 +108,6 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   // blends two colors. The existing color of the cell and the chosen color are passed to it
   const mixedColor = mixColors(grid[y][x].color, chosenColor);
 
-  console.log('Chosen color:', chosenColor);
-  console.log('Counts before update:', counts);
-
   // Update the color of the cell in the grid to the new mixed color
   grid[y][x].color = mixedColor;
 
@@ -135,10 +132,13 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
     counts.squareMostDropsLocation = { x, y };
   }
 
-  console.log('Counts after update:', counts);
-
   // Return the updated grid and counts, along with the coordinates of the painted cell
-  return { grid, counts, paintedCell: { x, y }, chosenColor };
+  return {
+    grid,
+    counts,
+    paintedCell: { x, y },
+    chosenColor
+  };
 };
 
 
@@ -167,7 +167,10 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
     // - updatedGrid: the new state of the grid after painting the cell.
     // - newCounts: updated painting counts after the cell is painted.
     // - paintedCell: the coordinates (x, y) of the cell that was just painted.
-    const { grid: updatedGrid, counts: newCounts, paintedCell } = paintRandomCell(grid, X, Y, C1, C2, C3, counts);
+    const {
+      grid: updatedGrid,
+      counts: newCounts, paintedCell
+    } = paintRandomCell(grid, X, Y, C1, C2, C3, counts);
 
     // Update the grid and counts with the values returned from painting a cell
     grid = updatedGrid;
@@ -192,7 +195,13 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
 
       // Return an object containing the count of paint actions, number of painted cells,
       // updated counts, the result of stopping criteria, and the stopping criteria (S)
-      return { count, paintedCells, counts, stoppingCriteriaResult, S };
+      return {
+        count,
+        paintedCells,
+        counts,
+        stoppingCriteriaResult,
+        S
+      };
     }
   }
 };

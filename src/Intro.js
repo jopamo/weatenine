@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import './Intro.css'; // Assuming you have a CSS file for global styles
 
 function Intro({ setCurrentPage }) {
   useEffect(() => {
