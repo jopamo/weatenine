@@ -182,7 +182,7 @@ function App({ setCurrentPage }) {
           // 'x' and 'y' are the coordinates of the cell
           // 'cell.color || 'grey'' determines the color to use for the cell:
           //   If 'cell.color' is defined, use it; otherwise, default to 'grey'
-          drawCell(ctx, x, y, cell.color || 'grey');
+          drawCell(ctx, x, y, cell.color || '#282c34');
         });
       });
     },
