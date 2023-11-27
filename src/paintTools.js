@@ -185,7 +185,8 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
     // - paintedCell: the coordinates (x, y) of the cell that was just painted.
     const {
       grid: updatedGrid,
-      counts: newCounts, paintedCell
+      counts: newCounts,
+      paintedCell
     } = paintRandomCell(grid, X, Y, C1, C2, C3, counts);
 
     // Update the grid and counts with the values returned from painting a cell

@@ -152,8 +152,8 @@ function App({ setCurrentPage }) {
           // Call 'drawCell' to draw the current cell
           // 'ctx' is the canvas context.
           // 'x' and 'y' are the coordinates of the cell
-          // 'cell.color || 'grey'' determines the color to use for the cell:
-          //   If 'cell.color' is defined, use it; otherwise, default to 'grey'
+          // 'cell.color || '#282c34'' determines the color to use for the cell:
+          //   If 'cell.color' is defined, use it; otherwise, default to background color
           drawCell(ctx, x, y, cell.color || '#282c34');
         });
       });
@@ -199,7 +199,6 @@ function App({ setCurrentPage }) {
 
   const resetBoardAndCounts = useCallback(() => {
     const newGrid = initializeGrid(xDimension, yDimension);
-
 
     setGrid(newGrid);
     setColorCounts({
