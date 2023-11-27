@@ -1,7 +1,52 @@
-.intro-animation {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 24px;
+.Experiments {
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  background-color: #282c34;
+  padding: 20px;
+  text-align: center;
+  min-height: 100vh;
+}
+
+h1, h2 {
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.button-spacing {
+  margin-right: 10px;
+}
+
+p.error-message {
+  color: #ff0000;
+  margin: 10px 0;
+}
+
+.results {
+  margin-top: 20px;
+}
+
+.result-item {
+  background-color: #333;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.result-item p {
+  color: #ddd;
+  margin: 5px 0;
 }

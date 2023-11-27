@@ -1,7 +1,7 @@
 // Import necessary hooks and components from React and other files
 import React, { useState, useEffect, useCallback } from 'react';
 import { PAINT_ONCE } from './paintTools';
-import './App.css'; // Importing CSS for styling
+import './Experiments.css'; // Importing CSS for styling
 
 // Define the Experiments component. It receives 'setCurrentPage' as a prop for navigation
 function Experiments({ setCurrentPage }) {
@@ -86,20 +86,20 @@ function Experiments({ setCurrentPage }) {
 
   // Render the component
   return (
-    <div>
-      <h1>Experiment Setup</h1>
-      <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
-      <button onClick={handleReturnToApp}>Return to Canvas</button>
-      {errorMessage && <p>Error: {errorMessage}</p>}
-      <div>
-        <h2>Results</h2>
-        {/* Map through the results array to display each experiment's result. */}
-        {results.map((result, index) => (
-          <div key={index}>
-            <p>Experiment {index + 1}:</p>
-            {/* Display details of the experiment result. */}
-            <p>X: {result.X}, Y: {result.Y}, R: {result.R}</p>
-            <p>Count: {result.count}</p>
+  <div className="Experiments">
+    <h1>Experiment Setup</h1>
+    <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
+    <button onClick={handleReturnToApp}>Return to Canvas</button>
+    {errorMessage && <p className="error-message">Error: {errorMessage}</p>}
+    <div className="results">
+      <h2>Results</h2>
+      {/* Map through the results array to display each experiment's result. */}
+      {results.map((result, index) => (
+        <div key={index} className="result-item">
+          <p>Experiment {index + 1}:</p>
+          {/* Display details of the experiment result. */}
+          <p>X: {result.X}, Y: {result.Y}, R: {result.R}</p>
+          <p>Count: {result.count}</p>
             <p>Painted Cells: {result.paintedCells}</p>
             <p>Stopping Criterion (S): {result.S}</p>
             <p>Total Color 1 Drops: {result.counts.totalColor1}</p>
@@ -112,6 +112,7 @@ function Experiments({ setCurrentPage }) {
       </div>
     </div>
   );
+
 }
 
 export default Experiments;

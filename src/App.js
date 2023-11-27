@@ -361,7 +361,7 @@ return (
             {renderColorOptions([color1, color2])}
           </select>
         </div>
-        <div className="form-group">
+        <div className="form-group stopping-criterion">
           <label>Stopping Criterion:</label>
           <select
             value={stoppingCriterion}
@@ -373,7 +373,7 @@ return (
             <option value="allMixedColors">Entire Board Mixed Colors</option>
           </select>
         </div>
-        <div className="form-group">
+        <div className="form-group drop-speed">
           <label>Drop Speed:</label>
           <input
             type="range"
@@ -384,43 +384,48 @@ return (
           />
         </div>
         <div className="buttons-container">
-          <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
-          <button onClick={handleContinue}>Continue</button>
+            <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
+            <button onClick={handleContinue}>Continue</button>
+          </div>
+        </form>
+      </div>
+
+      <div className="stopping-criteria-message">
+        {stoppingCriteriaMessage && <p>{stoppingCriteriaMessage}</p>}
+      </div>
+
+      <div className="canvas-and-chart-container">
+        <div className="canvas-container">
+          <canvas ref={canvasRef} className="paintCanvas"></canvas>
         </div>
-      </form>
+
+        <div className="color-counts">
+          <table>
+            <thead>
+              <tr>
+                <th>Color</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="color-swatch" style={{ backgroundColor: color1 }}></td>
+                <td>{colorCounts.totalColor1}</td>
+              </tr>
+              <tr>
+                <td className="color-swatch" style={{ backgroundColor: color2 }}></td>
+                <td>{colorCounts.totalColor2}</td>
+              </tr>
+              <tr>
+                <td className="color-swatch" style={{ backgroundColor: color3 }}></td>
+                <td>{colorCounts.totalColor3}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div className="canvas-container">
-      <canvas ref={canvasRef} className="paintCanvas"></canvas>
-    </div>
-    <div className="stopping-criteria-message">
-      {stoppingCriteriaMessage && <p>{stoppingCriteriaMessage}</p>}
-    </div>
-    <div className="color-counts">
-      <table>
-        <thead>
-          <tr>
-            <th>Color</th>
-            <th>Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style={{ backgroundColor: color1, width: '50px', height: '20px' }}></td>
-            <td>{colorCounts.totalColor1}</td>
-          </tr>
-          <tr>
-            <td style={{ backgroundColor: color2, width: '50px', height: '20px' }}></td>
-            <td>{colorCounts.totalColor2}</td>
-          </tr>
-          <tr>
-            <td style={{ backgroundColor: color3, width: '50px', height: '20px' }}></td>
-            <td>{colorCounts.totalColor3}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
+  );
 }
 
 export default App;
