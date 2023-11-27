@@ -163,9 +163,6 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
   // Init a grid based on given dimensions X (width) and Y (height)
   let grid = initializeGrid(X, Y);
 
-  // Init counter to track the number of times a cell is painted
-  let count = 0;
-
   // Initialize a 'Set' to track unique painted cells on the grid.
   // 'Set' is used here because it automatically handles uniqueness,
   // ensuring each cell is tracked only once
@@ -173,9 +170,6 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
 
   // continue until a stopping criterion is met.
   while (true) {
-    // paint action counter
-    count++;
-
     // Execute the paintRandomCell function, which paints a random cell on the grid
     // and returns an object containing the updated grid and counts, and the
     // coordinates of the painted cell
@@ -213,7 +207,6 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
       // Return an object containing the count of paint actions, number of painted cells,
       // updated counts, the result of stopping criteria, and the stopping criteria (S)
       return {
-        count,
         paintedCells,
         counts,
         stoppingCriteriaResult,
