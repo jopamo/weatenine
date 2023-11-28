@@ -7,7 +7,7 @@ function Intro({ setCurrentPage }) {
   const pixiContainer = useRef(null);
 
   const titleText = 'Welcome to Random Paint';
-  const infoTextContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aenean et tortor at risus viverra adipiscing at. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Congue eu consequat ac felis donec et odio pellentesque. Adipiscing bibendum est ultricies integer. A erat nam at lectus urna duis convallis convallis tellus. sto ";
+  const infoTextContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aenean et tortor at risus viverra adipiscing at. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Congue eu consequat ac felis donec et odio pellentesque. Adipiscing bibendum est ultricies integer. A erat nam at lectus urna duis convallis convallis tellus.";
 
   const handleToApp = () => {
     setCurrentPage("app");
@@ -84,9 +84,9 @@ function Intro({ setCurrentPage }) {
     infoText.y = titleMessage.y + 60;
 
     const background = new PIXI.Graphics();
-    const backgroundWidth = 400;
-    const backgroundHeight = infoText.height + 20;
-    background.beginFill(0xFFFFFF, 0.7);
+    const backgroundWidth = infoText.width + 35;
+    const backgroundHeight = infoText.height + 35;
+    background.beginFill(0xFFFFFF, 0.3);
     background.drawRect(0, 0, backgroundWidth, backgroundHeight);
     background.endFill();
     background.x = (app.screen.width - backgroundWidth) / 2;
@@ -109,6 +109,9 @@ function Intro({ setCurrentPage }) {
       infoText.style = new PIXI.TextStyle({ ...infoTextStyle, wordWrapWidth: backgroundWidth - 40 });
       infoText.x = background.x + 20;
       infoText.y = background.y + 10;
+
+      littleRobot.x = app.screen.width / 2;
+      littleRobot.y = app.screen.height / 2;
     };
 
     resizeElements();
