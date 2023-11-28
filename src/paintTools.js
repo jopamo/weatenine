@@ -122,7 +122,6 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   const mixedColor = mixColors(grid[y][x].color, chosenColor);
 
   // Update the color of the cell in the grid to the new mixed color
-  console.log(`Painting cell at [${x}, ${y}] with color ${chosenColor}`);
   grid[y][x].color = mixedColor;
 
   // Increment the count of how many times the cell has been painted
