@@ -9,11 +9,11 @@ function Intro({ setCurrentPage }) {
   const titleText = 'Welcome to Random Paint';
   const infoTextContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aenean et tortor at risus viverra adipiscing at. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Congue eu consequat ac felis donec et odio pellentesque. Adipiscing bibendum est ultricies integer. A erat nam at lectus urna duis convallis convallis tellus.";
 
-  const handleToApp = () => {
-    setCurrentPage("app");
-  };
-
   useEffect(() => {
+    const handleToApp = () => {
+      setCurrentPage("app");
+    };
+
     const app = new PIXI.Application({
       resizeTo: window,
       transparent: true,
