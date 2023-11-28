@@ -31,15 +31,15 @@ function Intro({ setCurrentPage }) {
     let scale = 1;
     let scaleSpeed = 0.0001;
 
-    const littleRobot = PIXI.Sprite.from('splash.png');
-    littleRobot.anchor.set(0.5);
-    littleRobot.x = app.screen.width / 2;
-    littleRobot.y = app.screen.height / 2;
-    app.stage.addChild(littleRobot);
+    const paintSplash = PIXI.Sprite.from('splash.png');
+    paintSplash.anchor.set(0.5);
+    paintSplash.x = app.screen.width / 2;
+    paintSplash.y = app.screen.height / 2;
+    app.stage.addChild(paintSplash);
 
     const blurFilter1 = new PIXI.filters.BlurFilter();
     const blurFilter2 = new PIXI.filters.BlurFilter();
-    littleRobot.filters = [blurFilter2];
+    paintSplash.filters = [blurFilter2];
 
     let count = 0;
     app.ticker.add(() => {
@@ -84,8 +84,8 @@ function Intro({ setCurrentPage }) {
     infoText.y = titleMessage.y + 60;
 
     const background = new PIXI.Graphics();
-    const backgroundWidth = infoText.width + 35;
-    const backgroundHeight = infoText.height + 35;
+    const backgroundWidth = infoText.width ;
+    const backgroundHeight = infoText.height + 50;
     background.beginFill(0xFFFFFF, 0.3);
     background.drawRect(0, 0, backgroundWidth, backgroundHeight);
     background.endFill();
@@ -110,8 +110,8 @@ function Intro({ setCurrentPage }) {
       infoText.x = background.x + 20;
       infoText.y = background.y + 10;
 
-      littleRobot.x = app.screen.width / 2;
-      littleRobot.y = app.screen.height / 2;
+      paintSplash.x = app.screen.width / 2;
+      paintSplash.y = app.screen.height / 2;
     };
 
     resizeElements();

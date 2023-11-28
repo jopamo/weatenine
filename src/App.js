@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { checkStoppingCriteria, paintRandomCell, initializeGrid } from './paintTools';
+import Background from './Background';
 import { debounce } from 'lodash';
 import './App.css';
 
@@ -130,7 +131,7 @@ function App({ setCurrentPage }) {
           // 'x' and 'y' are the coordinates of the cell
           // 'cell.color || '#282c34'' determines the color to use for the cell:
           //   If 'cell.color' is defined, use it; otherwise, default to background color
-          drawCell(ctx, x, y, cell.color || '#282c34');
+          drawCell(ctx, x, y, cell.color || 'transparent');
         });
       });
     },
@@ -147,10 +148,12 @@ function App({ setCurrentPage }) {
   // Set up the canvas and its context
   useEffect(() => {
     const canvas = canvasRef.current;
-    ctxRef.current = canvas.getContext('2d');
-    canvas.width = xDimension * 20; // Assuming each cell is 20x20 pixels
-    canvas.height = yDimension * 20;
-    drawGrid();
+    if (canvas) {
+      ctxRef.current = canvas.getContext('2d');
+      canvas.width = xDimension * 20; // Assuming each cell is 20x20 pixels
+      canvas.height = yDimension * 20;
+      drawGrid();
+    }
   }, [xDimension, yDimension, drawGrid]);
 
   // When grid dimensions change, we generate a new empty grid with the new dimensions
@@ -282,8 +285,10 @@ function App({ setCurrentPage }) {
 
 return (
   <div className="App">
+    <Background />
     <div className="control-panel">
       <form onSubmit={handleSubmit} className="settings-form">
+        <div className="form-row">
         <div className="form-group">
           <label>X:</label>
           <input
@@ -306,6 +311,8 @@ return (
             disabled={isPainting}
             maxLength="2" />
         </div>
+        </div>
+        <div className="form-row">
         <div className="form-group">
           <label>Color 1:</label>
           <select
@@ -336,6 +343,8 @@ return (
             {renderColorOptions([color1, color2])}
           </select>
         </div>
+        </div>
+        <div className="form-row">
         <div className="form-group stopping-criterion">
           <label>Stopping Criterion:</label>
           <select
@@ -357,6 +366,7 @@ return (
             value={dropSpeed}
             onChange={(e) => setDropSpeed(e.target.value)}
           />
+        </div>
         </div>
         <div className="buttons-container">
             <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>

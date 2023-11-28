@@ -1,43 +1,39 @@
-/* Add a universal reset for margin and padding */
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* This ensures padding doesn't affect the total width/height */
+  box-sizing: border-box;
 }
 
-/* Global styles for the intro animation container */
+
 .intro-animation {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #282c34; /* A dark background color */
-  color: #fff; /* White text color for contrast */
-  text-align: center; /* Center-align the text */
-  overflow: hidden; /* Hide overflow */
+  background-color: #282c34;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
 }
 
-/* Styling for paragraphs inside the intro animation container */
 .intro-animation p {
-  font-size: 1.5em; /* Slightly larger text */
-  line-height: 1.4; /* Adjust line height for better readability */
+  font-size: 1.5em;
+  line-height: 1.4;
 }
 
-/* Responsive styling for the PIXI container */
 .pixi-container {
-  width: auto; /* Full width to start with */
-  height: auto; /* Auto height to maintain aspect ratio */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+  width: auto;
+  height: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive design: adjust text size and PIXI container size on smaller screens */
 @media (max-width: 768px) {
   .intro-animation p {
-    font-size: 1.2em; /* Smaller text for smaller screens */
+    font-size: 1.2em;
   }
 
   .pixi-container {
-    aspect-ratio: 16 / 9; /* Wider aspect ratio on smaller screens */
+    aspect-ratio: 16 / 9;
   }
 }

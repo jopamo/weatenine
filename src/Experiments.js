@@ -1,6 +1,7 @@
 // Import necessary hooks and components from React and other files
 import React, { useState, useEffect, useCallback } from 'react';
 import { PAINT_ONCE } from './paintTools';
+import Background from './Background';
 import './Experiments.css'; // Importing CSS for styling
 
 // Define the Experiments component. It receives 'setCurrentPage' as a prop for navigation
@@ -88,6 +89,7 @@ function Experiments({ setCurrentPage }) {
   // Render the component
   return (
   <div className="Experiments">
+    <Background />
     <h1>Experiment Setup</h1>
     <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
     <button onClick={handleReturnToApp}>Return to Canvas</button>
