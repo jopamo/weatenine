@@ -1,37 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import './App.css';
 import { checkStoppingCriteria, paintRandomCell, initializeGrid } from './paintTools';
+import { debounce } from 'lodash';
+import './App.css';
 
 function App({ setCurrentPage }) {
   const paintingIntervalRef = useRef(null);
   const isPaintingRef = useRef(false);
 
-  // Define a debounce function to limit the rate at which a function can fire
-  function debounce(fn, ms) {
-    // Declare a variable 'timer' to keep track of the setTimeout
-    let timer;
-
-    // Return a new function that will be the actual debounced function
-    return _ => {
-      // Clear any existing timeout to reset the timer.
-      // This prevents the previous function call from executing if it's within the timeout period
-      clearTimeout(timer);
-
-      // Set a new timeout. The original function 'fn' will be called after 'ms' milliseconds
-      // if this returned function is not called again during that time
-      timer = setTimeout(_ => {
-        // Reset the timer to null once the delay is over
-        timer = null;
-
-        // Call the original function 'fn' with the context 'this' and any arguments passed
-        // 'apply' is used to call 'fn' with the context 'this' and an array-like object 'arguments'
-        fn.apply(this, arguments);
-      }, ms);
-    };
-  }
-
-
-   // Define a function to calculate the initial dimensions for the grid based on the window size
+  // Define a function to calculate the initial dimensions for the grid based on the window size
   const calculateInitialDimensions = () => {
     // Get the inner width of the window (the width of the viewport)
     const width = window.innerWidth;

@@ -1,9 +1,17 @@
 import React, { useRef, useEffect } from 'react';
 import * as PIXI from 'pixi.js';
+import { debounce } from 'lodash';
 import './Intro.css';
 
 function Intro({ setCurrentPage }) {
   const pixiContainer = useRef(null);
+
+  const titleText = 'Welcome to Random Paint';
+  const infoTextContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aenean et tortor at risus viverra adipiscing at. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Congue eu consequat ac felis donec et odio pellentesque. Adipiscing bibendum est ultricies integer. A erat nam at lectus urna duis convallis convallis tellus. sto ";
+
+  const handleToApp = () => {
+    setCurrentPage("app");
+  };
 
   useEffect(() => {
     const app = new PIXI.Application({
@@ -15,77 +23,103 @@ function Intro({ setCurrentPage }) {
     currentContainer.appendChild(app.view);
 
     // Background image
-    const bg = PIXI.Sprite.from('https://pixijs.com/assets/pixi-filters/bg_depth_blur.jpg');
+    const bg = PIXI.Sprite.from('texture.jpg');
     bg.width = app.screen.width;
     bg.height = app.screen.height;
     app.stage.addChild(bg);
 
-    // Sprites
-    const littleDudes = PIXI.Sprite.from('https://pixijs.com/assets/pixi-filters/depth_blur_dudes.jpg');
-    littleDudes.x = (app.screen.width / 2) - 315;
-    littleDudes.y = 200;
-    app.stage.addChild(littleDudes);
+    let scale = 1;
+    let scaleSpeed = 0.0001;
 
-    const littleRobot = PIXI.Sprite.from('https://pixijs.com/assets/pixi-filters/depth_blur_moby.jpg');
-    littleRobot.x = (app.screen.width / 2) - 200;
-    littleRobot.y = 100;
+    const littleRobot = PIXI.Sprite.from('splash.png');
+    littleRobot.anchor.set(0.5);
+    littleRobot.x = app.screen.width / 2;
+    littleRobot.y = app.screen.height / 2;
     app.stage.addChild(littleRobot);
 
-    // Blur filters
     const blurFilter1 = new PIXI.filters.BlurFilter();
     const blurFilter2 = new PIXI.filters.BlurFilter();
-    littleDudes.filters = [blurFilter1];
     littleRobot.filters = [blurFilter2];
 
-    // Animation for blur
     let count = 0;
-
     app.ticker.add(() => {
       count += 0.005;
       blurFilter1.blur = 20 * Math.cos(count);
       blurFilter2.blur = 20 * Math.sin(count);
+
+      scale += scaleSpeed;
+      bg.scale.set(scale);
+
+      // Reset scale after a certain point to create a looping effect
+      if (scale >= 1.05 || scale <= 0.95) {
+        scaleSpeed *= -1;
+      }
     });
 
-    const message = new PIXI.Text('Welcome to Random paint', new PIXI.TextStyle({
+    const textStyle = {
       fontFamily: 'Arial',
-      dropShadow: true,
-      dropShadowAlpha: 0.8,
-      dropShadowAngle: 2.1,
-      dropShadowBlur: 4,
-      dropShadowColor: '#111111',
-      dropShadowDistance: 10,
-      fill: ['#ffffff'],
-      stroke: '#004620',
-      fontSize: 60,
-      fontWeight: 'lighter',
-      lineJoin: 'round',
-      strokeThickness: 12,
-    }));
-    message.anchor.set(0.5);
-    message.x = app.screen.width / 2;
-    message.y = app.screen.height / 2;
-    app.stage.addChild(message);
+      fill: 'white',
+      stroke: 'black',
+      strokeThickness: 4,
+      fontSize: Math.max(20, window.innerWidth / 30),
 
-    // Function to resize text
-    const resizeText = () => {
-      const newSize = Math.max(20, window.innerWidth / 30); // Adjust this formula as needed
-      message.style.fontSize = newSize;
-      message.x = app.screen.width / 2;
-      message.y = app.screen.height / 2;
     };
 
-    // Call resizeText initially and on window resize
-    resizeText(app, message);
-    window.addEventListener('resize', resizeText);
+    const titleMessage = new PIXI.Text(titleText, new PIXI.TextStyle(textStyle));
+    titleMessage.anchor.set(0.5);
+    titleMessage.x = app.screen.width / 2;
+    titleMessage.y = 50;
+    app.stage.addChild(titleMessage);
 
-    // Auto-navigate after 10 seconds
-    const timer = setTimeout(() => {
-      setCurrentPage('app');
-    }, 10000);
+    const infoTextStyle = new PIXI.TextStyle({
+      fontFamily: 'Arial',
+      fontSize: 16,
+      fill: 0x000000,
+      wordWrap: true,
+      wordWrapWidth: 400
+    });
+
+    const infoText = new PIXI.Text(infoTextContent, infoTextStyle);
+    infoText.x = 20;
+    infoText.y = titleMessage.y + 60;
+
+    const background = new PIXI.Graphics();
+    const backgroundWidth = 400;
+    const backgroundHeight = infoText.height + 20;
+    background.beginFill(0xFFFFFF, 0.7);
+    background.drawRect(0, 0, backgroundWidth, backgroundHeight);
+    background.endFill();
+    background.x = (app.screen.width - backgroundWidth) / 2;
+    background.y = infoText.y - 10;
+
+    app.stage.addChild(background);
+    app.stage.addChild(infoText);
+
+    const resizeElements = () => {
+      if (!app.view) return;
+
+      const newTitleSize = Math.max(20, window.innerWidth / 30);
+      titleMessage.style = new PIXI.TextStyle({ ...textStyle, fontSize: newTitleSize });
+      titleMessage.x = app.screen.width / 2;
+      titleMessage.y = 50;
+
+      background.x = (app.screen.width - backgroundWidth) / 2;
+      background.y = titleMessage.y + 60;
+
+      infoText.style = new PIXI.TextStyle({ ...infoTextStyle, wordWrapWidth: backgroundWidth - 40 });
+      infoText.x = background.x + 20;
+      infoText.y = background.y + 10;
+    };
+
+    resizeElements();
+
+    const debouncedResizeElements = debounce(resizeElements, 100);
+    window.addEventListener('resize', debouncedResizeElements);
+    currentContainer.addEventListener('click', handleToApp);
 
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', resizeText);
+      window.removeEventListener('resize', debouncedResizeElements);
+      currentContainer.removeEventListener('click', handleToApp);
       currentContainer.removeChild(app.view);
       app.destroy(true, { children: true, texture: true, baseTexture: true });
     };
@@ -96,10 +130,8 @@ function Intro({ setCurrentPage }) {
       <div ref={pixiContainer} className="pixi-container">
         {/* Pixi.js canvas will be attached here */}
       </div>
-      {/* Add more elements if needed */}
     </div>
-);
-
+  );
 }
 
 export default Intro;
