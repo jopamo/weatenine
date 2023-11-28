@@ -197,20 +197,21 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
     if (stoppingCriteriaResult.met) {
       // Calculate the total number of color drops by adding the totals of each color
       const totalDrops = counts.totalColor1 + counts.totalColor2 + counts.totalColor3;
+      counts.totalDrops = totalDrops;
 
       // Calculate the average number of drops per square on the grid
       counts.averageTotal = totalDrops / (X * Y);
 
       // Determine the total number of unique cells that have been painted
       const paintedCells = paintedCellsTracker.size;
+      counts.paintedCells = paintedCells;
 
-      // Return an object containing the count of paint actions, number of painted cells,
-      // updated counts, the result of stopping criteria, and the stopping criteria (S)
+      // Return an object containing the total number of drops (totalDrops), count of uniquely
+      // painted cells (paintedCells), number of drops of each color (counts), the stopping criteria
+      // messaging (stoppingCriteriaResult), and the stopping criteria string value used (S)
       return {
-        paintedCells,
         counts,
-        stoppingCriteriaResult,
-        S
+        stoppingCriteriaResult
       };
     }
   }

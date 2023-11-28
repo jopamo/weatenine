@@ -65,11 +65,13 @@ function Experiments({ setCurrentPage }) {
           return;
       }
 
+      const stoppingCriterion = "allMixedColors";
+
       // Run the paint experiment with the determined parameters
-      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, 'allMixedColors', counts);
+      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, stoppingCriterion, counts);
 
       // Add the result of the experiment to the results array
-      setResults(prevResults => [...prevResults, { X, Y, R, ...experimentResult }]);
+      setResults(prevResults => [...prevResults, { X, Y, R, stoppingCriterion, ...experimentResult }]);
     });
 
     setErrorMessage(""); // Clear any error messages after running the experiment
@@ -99,9 +101,9 @@ function Experiments({ setCurrentPage }) {
           <p>Experiment {index + 1}:</p>
           {/* Display details of the experiment result. */}
           <p>X: {result.X}, Y: {result.Y}, R: {result.R}</p>
-          <p>Count: {result.count}</p>
-            <p>Painted Cells: {result.paintedCells}</p>
-            <p>Stopping Criterion (S): {result.S}</p>
+            <p>Uniquely Painted Cells: {result.counts.paintedCells}</p>
+            <p>Total Drops: {result.counts.totalDrops}</p>
+            <p>Stopping Criterion (S): {result.stoppingCriterion}</p>
             <p>Total Color 1 Drops: {result.counts.totalColor1}</p>
             <p>Total Color 2 Drops: {result.counts.totalColor2}</p>
             <p>Total Color 3 Drops: {result.counts.totalColor3}</p>
