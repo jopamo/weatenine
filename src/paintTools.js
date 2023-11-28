@@ -149,8 +149,7 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   return {
     grid,
     counts,
-    paintedCell: { x, y },
-    chosenColor
+    paintedCell: { x, y }
   };
 };
 
@@ -190,10 +189,10 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
     paintedCellsTracker.add(`${paintedCell.x},${paintedCell.y}`);
 
     // Check if any of the defined stopping criteria have been met
-    const stoppingCriteriaResult = checkStoppingCriteria(grid, S, C1, C2, C3);
+    const stopMessage = checkStoppingCriteria(grid, S, C1, C2, C3);
 
     // If a stopping criterion is met, exit the loop
-    if (stoppingCriteriaResult.met) {
+    if (stopMessage.met) {
       // Calculate the total number of color drops by adding the totals of each color
       const totalDrops = counts.totalColor1 + counts.totalColor2 + counts.totalColor3;
       counts.totalDrops = totalDrops;
@@ -207,10 +206,10 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
 
       // Return an object containing the total number of drops (totalDrops), count of uniquely
       // painted cells (paintedCells), number of drops of each color (counts), the stopping criteria
-      // messaging (stoppingCriteriaResult), and the stopping criteria string value used (S)
+      // messaging (stopMessage), and the stopping criteria string value used (S)
       return {
         counts,
-        stoppingCriteriaResult
+        stopMessage
       };
     }
   }

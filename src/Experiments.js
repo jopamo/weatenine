@@ -40,7 +40,6 @@ function Experiments({ setCurrentPage }) {
         totalColor2: 0,
         totalColor3: 0,
         squareMostDrops: 0,
-        averageTotal: 0,
       };
 
       // Determine the parameters for the experiment based on the independent variable chosen
@@ -65,7 +64,7 @@ function Experiments({ setCurrentPage }) {
           return;
       }
 
-      const stoppingCriterion = "allMixedColors";
+      const stoppingCriterion = "lastUnpainted";
 
       // Run the paint experiment with the determined parameters
       const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, stoppingCriterion, counts);
