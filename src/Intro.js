@@ -107,7 +107,7 @@ function Intro({ setCurrentPage }) {
       background.y = titleMessage.y + 60;
 
       infoText.style = new PIXI.TextStyle({ ...infoTextStyle, wordWrapWidth: backgroundWidth - 40 });
-      infoText.x = background.x + 20;
+      infoText.x = (app.screen.width - infoText.width) / 2;
       infoText.y = background.y + 10;
 
       paintSplash.x = app.screen.width / 2;
