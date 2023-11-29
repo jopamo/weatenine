@@ -204,9 +204,9 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
       const paintedCells = paintedCellsTracker.size;
       counts.paintedCells = paintedCells;
 
-      // Return an object containing the total number of drops (totalDrops), count of uniquely
-      // painted cells (paintedCells), number of drops of each color (counts), the stopping criteria
-      // messaging (stopMessage), and the stopping criteria string value used (S)
+      // Return an object containing 2 more objects: 'counts' contains all the math results from
+      // paintRandomCell, 'stopMessage' contains the messaging to give to the user interface (React)
+      // from checkStoppingCriteria.
       return {
         counts,
         stopMessage
