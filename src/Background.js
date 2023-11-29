@@ -1,6 +1,6 @@
-// Background.js
 import React, { useRef, useEffect } from 'react';
 import * as PIXI from 'pixi.js';
+import { debounce } from 'lodash';
 import './Background.css';
 
 function Background({ onBackgroundClick }) {
@@ -29,6 +29,19 @@ function Background({ onBackgroundClick }) {
     paintSplash.y = app.screen.height / 2;
     app.stage.addChild(paintSplash);
 
+    const resizeSplash = () => {
+      const scaleX = app.screen.width / paintSplash.texture.width;
+      const scaleY = app.screen.height / paintSplash.texture.height;
+      const coverScale = Math.max(scaleX, scaleY);
+
+      paintSplash.scale.set(coverScale);
+      paintSplash.x = app.screen.width / 2;
+      paintSplash.y = app.screen.height / 2;
+
+      bg.width = app.screen.width;
+      bg.height = app.screen.height;
+    };
+
     const blurFilter1 = new PIXI.filters.BlurFilter();
     const blurFilter2 = new PIXI.filters.BlurFilter();
     paintSplash.filters = [blurFilter2];
@@ -43,21 +56,19 @@ function Background({ onBackgroundClick }) {
       bg.scale.set(scale);
 
       // Reset scale after a certain point to create a looping effect
-      if (scale >= 1.05 || scale <= 0.95) {
+      if (scale >= 1.50 || scale <= 1.0) {
         scaleSpeed *= -1;
       }
+
+      resizeSplash();
     });
 
-    const handleResize = () => {
-      paintSplash.x = app.screen.width / 2;
-      paintSplash.y = app.screen.height / 2;
-    };
-
-    window.addEventListener('resize', handleResize);
+    const debouncedResizeElements = debounce(resizeSplash, 100);
+    window.addEventListener('resize', debouncedResizeElements);
     currentContainer.addEventListener('click', onBackgroundClick);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', debouncedResizeElements);
       currentContainer.removeEventListener('click', onBackgroundClick);
       currentContainer.removeChild(app.view);
       app.destroy(true, { children: true, texture: true, baseTexture: true });

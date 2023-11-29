@@ -37,6 +37,16 @@ function Intro({ setCurrentPage }) {
     paintSplash.y = app.screen.height / 2;
     app.stage.addChild(paintSplash);
 
+    const resizeSplash = () => {
+      const scaleX = app.screen.width / paintSplash.texture.width;
+      const scaleY = app.screen.height / paintSplash.texture.height;
+      const coverScale = Math.max(scaleX, scaleY);
+
+      paintSplash.scale.set(coverScale);
+      paintSplash.x = app.screen.width / 2;
+      paintSplash.y = app.screen.height / 2;
+    };
+
     const blurFilter1 = new PIXI.filters.BlurFilter();
     const blurFilter2 = new PIXI.filters.BlurFilter();
     paintSplash.filters = [blurFilter2];
@@ -51,9 +61,11 @@ function Intro({ setCurrentPage }) {
       bg.scale.set(scale);
 
       // Reset scale after a certain point to create a looping effect
-      if (scale >= 1.05 || scale <= 0.95) {
+      if (scale >= 1.50 || scale <= 1.0) {
         scaleSpeed *= -1;
       }
+
+      resizeSplash();
     });
 
     const textStyle = {
@@ -112,6 +124,8 @@ function Intro({ setCurrentPage }) {
 
       paintSplash.x = app.screen.width / 2;
       paintSplash.y = app.screen.height / 2;
+      bg.width = app.screen.width;
+      bg.height = app.screen.height;
     };
 
     resizeElements();
