@@ -37,9 +37,6 @@ function Background({ onBackgroundClick }) {
       paintSplash.scale.set(coverScale);
       paintSplash.x = app.screen.width / 2;
       paintSplash.y = app.screen.height / 2;
-
-      bg.width = app.screen.width;
-      bg.height = app.screen.height;
     };
 
     const blurFilter1 = new PIXI.filters.BlurFilter();
