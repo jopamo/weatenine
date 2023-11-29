@@ -3,9 +3,9 @@ After the CONTINUE button is pushed, a new screen appears, and your website expl
 Here is more information about the experiments:
 
 As in HW3, each experiment will have an independent variable, and a dependent variable. Traditionally, in a graph of experimental results, the independent variable is shown on the x axis. Possible independent variables are:
-	* D, a single dimension that is used for square canvases. (When you pick a D, you are picking both X and Y)
-	* X, the x-dimension, with the y-dimension held constant.
-	* R, the number of repetitions in the experiment
+* D, a single dimension that is used for square canvases. (When you pick a D, you are picking both X and Y)
+* X, the x-dimension, with the y-dimension held constant.
+* R, the number of repetitions in the experiment
 
 Once one of those independent variables is chosen, the user must give a list of different, increasing values for the independent variable. Only appropriate values should be accepted, and when the user enters an inappropriate value, your program must give a descriptive error message, and re-prompt. Your group should decide on a reasonable limit for the number of independent variable values you accept. Include a justification for that number in your program documentation.
 
@@ -22,8 +22,8 @@ If the number of repetitions is the independent variable, then both X and Y dime
 For the rest of this specification, PAINT_ONCE(X, Y, C1, C2, C3, S) means simulating the random painting of a single canvas with dimensions X by Y; using colors C1, C2, and C3; and stopping using the criterion S. PAINT_MANY(X, Y, C1, C2, C3, S, R) means doing that same random painting R times. For each of those times, random paintings occur.
 
 So we need these variables?
-	D
-	X
-	R
-	independentVarNum (int: limit the number
-	independentVarList (string: list of different, increasing values, limit the number)
+* D
+* X
+* R
+* independentVarNum (int: limit the number
+* independentVarList (string: list of different, increasing values, limit the number)
