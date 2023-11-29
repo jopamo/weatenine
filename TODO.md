@@ -1,23 +1,10 @@
 *TODO*
 
 HW4: LONG GROUP PROJECT for CS 4500, Fall 2023
-Hopefully, you’ve noticed the progression: HW1 – pair programming; HW2 – trios; HW3 – quartets. Your HW4 groups will have 4 or more people on your team. Canvas picked the teams randomly, but I made some swaps so that each team has at least one person who expressed some confidence about making websites.
 
-HW4 will NOT force you to use onlinegdb.com. In fact, you won’t be able to use it, at least not exclusively. For HW4, you and your group will be making an interactive website. You can use whatever programming languages you would like. You will be obliged to make a website. If you have access to a web server, feel free to use that. If you need me to provide a
-web site location, please let me know.
+~~In addition to the deliverable documents, the HW4 final project is delivered as a functioning web-based application. In other words, to run your HW4 completed project, someone will only need the URL you supply to run the program. That’s what you will hand in to me in addition to the deliverable documents: a URL.~~
 
-If you want me to pay for website hosting, please go to this website:
-https://www.namecheap.com/
-
-Sign up for a monthly rate, and buy two months of the least expensive plan. (If the cheapest plan has a limitation that cramps your style, make a case to me and I’ll consider the higher rate.) Email me the receipt, and I’ll reimburse.
-
-Unlike your first few programming projects in CS 4500, this project will take many weeks. The final version of all your documents, and your program, are due the evening of the final exam, at 23:59. Your HW4 group for lasts the rest of the semester. Do your best to get along, and contribute significantly to the group effort.
-
-In addition to the deliverable documents, the HW4 final project is delivered as a functioning web-based application. In other words, to run your HW4 completed project, someone will only need the URL you supply to run the program. That’s what you will hand in to me in addition to the deliverable documents: a URL.
-
-If you want to use an existing web server that you have access to, that’s fine. If no one in your group has access to a server where you can host your webpage, let me know and I’ll arrange something for your group.
-
-Whatever language or languages you choose, your documentation must be high quality. I hope your group can make the program look good and sound good. Creativity counts.
+~~Whatever language or languages you choose, your documentation must be high quality. I hope your group can make the program look good and sound good. Creativity counts.~~
 
 You will be turning in several important deliverables during the rest of the semester. Although I will comment on these preliminary versions after you turn them in, I will only grade them when they are turned in on the evening of the final exam. The MODULES section of our class Canvas site includes details of each of these documents. The documents are:
 
@@ -28,25 +15,26 @@ You will be turning in several important deliverables during the rest of the sem
 * Test Plan
 * Demo Video
 
-I suggest that your group plan immediately for people to start working on each of these documents.
 
-HW4 again uses pseudo-random numbers to simulate a rather fanciful idea. But there is no wandering in the woods this time. Instead, this time there are random drops of paint on a canvas. At each step, the program picks a random spot on a rectangular grid. The program then picks randomly from among three colors.
+~~HW4 again uses pseudo-random numbers to simulate a rather fanciful idea. But there is no wandering in the woods this time. Instead, this time there are random drops of paint on a canvas. At each step, the program picks a random spot on a rectangular grid. The program then picks randomly from among three colors.~~
 
-Each drop of paint on this magic canvas stays exactly in the square on the grid where it lands. (No splashing occurs.) When two drops land on the same spot, the colors mix. As paint drops fall, the paint may get very thick on some spots while other spots are bare; that is OK, and there is never any spill over between spots on the grid.
+~~Each drop of paint on this magic canvas stays exactly in the square on the grid where it lands. (No splashing occurs.) When two drops land on the same spot, the colors mix. As paint drops fall, the paint may get very thick on some spots while other spots are bare; that is OK, and there is never any spill over between spots on the grid.~~
 
 When someone visits your website, there should be an animation (or some other form of communication) that explains concisely what the website does. Then the program asks the user for several parameters, each of which you should limit as you deem appropriate. Your limitations should be justified by your plan for the website. You should make sure the user only enters values that are appropriate according to your limits, and reprompts until they do. The user choices you must ask for are:
 
-X dimension: the size of the grid from left to right; this is given in terms of the number of squares on the grid.
+~~X dimension: the size of the grid from left to right; this is given in terms of the number of squares on the grid.~~
 
-Y dimension: the size of the grid from left to right; this is given in terms of the number of squares on the grid. This may be the same size as the X dimension, but that is not assumed.
+~~Y dimension: the size of the grid from left to right; this is given in terms of the number of squares on the grid. This may be the same size as the X dimension, but that is not assumed.~~
 
-Color1, Color2, and Color3: Choosing from choices you make available, the user picks three colors. Give the user 8 or more choices.
+~~Color1, Color2, and Color3: Choosing from choices you make available, the user picks three colors. Give the user 8 or more choices.~~
 
-Stopping criterion: The user picks a stopping criterion for the random painting. You must include these two criteria as possible stopping points: as soon as the last unpainted square is painted for the first time; and the first time any square gets its second paint blob (this criterion is reminiscent of the birthday paradox). You should think of at least one other stopping criterion, and you may include more than one extra stopping criterion if you’d like.
+~~Stopping criterion: The user picks a stopping criterion for the random painting. You must include these two criteria as possible stopping points: as soon as the last unpainted square is painted for the first time; and the first time any square gets its second paint blob (this criterion is reminiscent of the birthday paradox). You should think of at least one other stopping criterion, and you may include more than one extra stopping criterion if you’d like.~~
 
-After the user picks these six parameters, your website should simulate the random painting, both visually and with appropriate sound. (Music and sound effects welcome.) You should include controls that allow the user to speed up or slow down the simulation.
+~~After the user picks these six parameters, your website should simulate the random painting, both visually and with appropriate sound. (Music and sound effects welcome.) You should include controls that allow the user to speed up or slow down the simulation.~~
 
-Once the initial simulation has been presented to the user, leave the final picture of the grid on the screen. Keep it visible until the user pushes a “CONTINUE” button. After the CONTINUE button is pushed, a new screen appears, and your website explains a new function for the website: building, executing, and displaying results from “experiments” based on the painting simulations. This explanation could be made using text and pictures, or with a video. Here is more information about the experiments:
+~~Once the initial simulation has been presented to the user, leave the final picture of the grid on the screen. Keep it visible until the user pushes a “CONTINUE” button.~~
+
+After the CONTINUE button is pushed, a new screen appears, and your website explains a new function for the website: building, executing, and displaying results from “experiments” based on the painting simulations. This explanation could be made using text and pictures, or with a video. Here is more information about the experiments:
 
 As in HW3, each experiment will have an independent variable, and a dependent variable. Traditionally, in a graph of experimental results, the independent variable is shown on the x axis. Possible independent variables are:
 * D, a single dimension that is used for square canvases. (When you pick a D, you are picking both X and Y)
