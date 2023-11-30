@@ -13,7 +13,7 @@ const isMixedColor = (color, originalColors) => {
 };
 
 // Calculate mix of two colors
-export const mixColors = (colorA, colorB) => {
+const mixColors = (colorA, colorB) => {
   if (!colorA) return colorB; // If no colorA, return colorB
   if (!colorB) return colorA;  // If no colorB, return colorA
 
@@ -155,7 +155,7 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
 
 
 // simulate painting the grid according to certain rules
-export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
+export const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
 
   // Init a grid based on given dimensions X (width) and Y (height)
@@ -165,6 +165,13 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
   // 'Set' is used here because it automatically handles uniqueness,
   // ensuring each cell is tracked only once
   let paintedCellsTracker = new Set();
+
+  let counts = {
+    totalColor1: 0,
+    totalColor2: 0,
+    totalColor3: 0,
+    squareMostDrops: 0,
+  };
 
   // continue until a stopping criterion is met.
   while (true) {
@@ -204,7 +211,7 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
       const paintedCells = paintedCellsTracker.size;
       counts.paintedCells = paintedCells;
 
-      // Return an object containing 2 more objects: 'counts' contains all the math results from
+      // Return an object containing 2 objects: 'counts' contains all the math results from
       // paintRandomCell, 'stopMessage' contains the messaging to give to the user interface (React)
       // from checkStoppingCriteria.
       return {

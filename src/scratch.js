@@ -155,7 +155,7 @@ const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, c
 
 
 // simulate painting the grid according to certain rules
-const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
+const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
 
   // Init a grid based on given dimensions X (width) and Y (height)
@@ -165,6 +165,13 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S, counts) => {
   // 'Set' is used here because it automatically handles uniqueness,
   // ensuring each cell is tracked only once
   let paintedCellsTracker = new Set();
+
+  let counts = {
+    totalColor1: 0,
+    totalColor2: 0,
+    totalColor3: 0,
+    squareMostDrops: 0,
+  };
 
   // continue until a stopping criterion is met.
   while (true) {
@@ -220,16 +227,9 @@ const Y = 10;
 const C1 = 'rgb(255,0,0)';
 const C2 = 'rgb(0,255,0)';
 const C3 = 'rgb(0,0,255)';
-const S = 'lastUnpainted';
+const S = 'allMixedColors';
 
-let counts = {
-  totalColor1: 0,
-  totalColor2: 0,
-  totalColor3: 0,
-  squareMostDrops: 0
-};
-
-const result = PAINT_ONCE(X, Y, C1, C2, C3, S, counts);
+const result = PAINT_ONCE(X, Y, C1, C2, C3, S);
 
 console.log("Total drops of Color 1:", result.counts.totalColor1);
 console.log("Total drops of Color 2:", result.counts.totalColor2);

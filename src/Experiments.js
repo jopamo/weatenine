@@ -36,12 +36,6 @@ function Experiments({ setCurrentPage }) {
     // Process each value to run the experiment
     inputValues.forEach(value => {
       let X, Y, R;
-      const counts = {
-        totalColor1: 0,
-        totalColor2: 0,
-        totalColor3: 0,
-        squareMostDrops: 0,
-      };
 
       // Determine the parameters for the experiment based on the independent variable chosen
       switch (independentVar) {
@@ -65,10 +59,10 @@ function Experiments({ setCurrentPage }) {
           return;
       }
 
-      const stoppingCriterion = "lastUnpainted";
+      const stoppingCriterion = "allMixedColors";
 
       // Run the paint experiment with the determined parameters
-      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, stoppingCriterion, counts);
+      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, stoppingCriterion);
 
       // Add the result of the experiment to the results array
       setResults(prevResults => [...prevResults, { X, Y, R, stoppingCriterion, ...experimentResult }]);
