@@ -8,6 +8,8 @@ function App({ setCurrentPage }) {
   const paintingIntervalRef = useRef(null);
   const isPaintingRef = useRef(false);
 
+  const cellSize = 20;
+
   // Define a function to calculate the initial dimensions for the grid based on the window size
   const calculateInitialDimensions = () => {
     // Get the inner width of the window (the width of the viewport)
@@ -21,14 +23,14 @@ function App({ setCurrentPage }) {
     // If it's a mobile device, set xDimension to 10
     // For non-mobile devices, calculate it based on the width of the window:
     // Divide the window width by 50 to get the number of cells, but limit it to a maximum of 25 cells
-    const xDimension = isMobile ? 10 : Math.min(Math.floor(width / 50), 25);
+    const xDimension = isMobile ? 15 : Math.min(Math.floor(width / 25), 60);
 
     // Calculate the yDimension (number of cells vertically) for the grid.
     // Similar to xDimension, but using the window's inner height for the calculation
     // If it's a mobile device, set yDimension to 10.
     // For non-mobile devices, divide the window height by 50 for the number of cells
     // with a maximum limit of 25 cells.
-    const yDimension = isMobile ? 10 : Math.min(Math.floor(window.innerHeight / 50), 25);
+    const yDimension = isMobile ? 35 : Math.min(Math.floor(window.innerHeight - 50), 44);
 
     // Return an object containing the calculated dimensions (xDimension and yDimension)
     return { xDimension, yDimension };
@@ -82,7 +84,7 @@ function App({ setCurrentPage }) {
   const [isPainting, setIsPainting] = useState(false);
 
   // State for managing the speed at which paint drops are applied
-  const [dropSpeed, setDropSpeed] = useState(10);
+  const [dropSpeed, setDropSpeed] = useState(50);
 
   // Render color options in the UI, excluding chosen colors
   const renderColorOptions = (excludeColors) => {
@@ -103,9 +105,9 @@ function App({ setCurrentPage }) {
     ctx.fillStyle = color;
 
     // Draw a filled rectangle (the cell) on the canvas at the specified coordinates
-    // The rectangle starts at (x * 20, y * 20) and has a size of 20x20 pixels
-    // The multiplication by 20 scales the grid coordinates to canvas coordinates
-    ctx.fillRect(x * 20, y * 20, 20, 20);
+    // The rectangle starts at (x * cellSize, y * cellSize)
+    // The multiplication by cellSize scales the grid coordinates to canvas coordinates
+    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
   }, []); // Empty dependency array since drawCell doesn't depend on external values
 
   // Draw the entire grid
@@ -150,8 +152,8 @@ function App({ setCurrentPage }) {
     const canvas = canvasRef.current;
     if (canvas) {
       ctxRef.current = canvas.getContext('2d');
-      canvas.width = xDimension * 20; // Assuming each cell is 20x20 pixels
-      canvas.height = yDimension * 20;
+      canvas.width = xDimension * cellSize;
+      canvas.height = yDimension * cellSize;
       drawGrid();
     }
   }, [xDimension, yDimension, drawGrid]);
@@ -259,7 +261,7 @@ function App({ setCurrentPage }) {
     if (!isPainting) return;
 
     // Set the interval to repeatedly call paintAndCheck
-    paintingIntervalRef.current = setInterval(paintAndCheck, 1000 / dropSpeed);
+    paintingIntervalRef.current = setInterval(paintAndCheck, 100 / dropSpeed);
 
     // Clean up the interval when the component unmounts or conditions change
     return () => clearInterval(paintingIntervalRef.current);
@@ -281,13 +283,24 @@ function App({ setCurrentPage }) {
     console.log("Starting painting");
     isPaintingRef.current = true;
     setIsPainting(true);
+
+    window.scrollTo({
+      left: 0,
+      top: document.documentElement.scrollHeight, // Scroll height of the entire document
+      behavior: 'smooth' // Optional: smooth scrolling
+    });
   };
 
 return (
   <div className="App">
     <Background />
+    <h1>Random Paint</h1>
     <div className="control-panel">
       <form onSubmit={handleSubmit} className="settings-form">
+        <div className="buttons-container">
+          <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
+          <button onClick={handleContinue}>Continue</button>
+        </div>
         <div className="form-row">
         <div className="form-group">
           <label>X:</label>
@@ -368,10 +381,6 @@ return (
           />
         </div>
         </div>
-        <div className="buttons-container">
-            <button onClick={startPainting} disabled={xDimension === 0 || yDimension === 0}>Start Painting</button>
-            <button onClick={handleContinue}>Continue</button>
-          </div>
         </form>
       </div>
 

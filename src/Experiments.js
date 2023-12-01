@@ -84,10 +84,13 @@ function Experiments({ setCurrentPage }) {
   return (
   <div className="Experiments">
     <Background />
-    <h1>Experiment Setup</h1>
-    <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
-    <button onClick={handleReturnToApp}>Return to Canvas</button>
-    {errorMessage && <p className="error-message">Error: {errorMessage}</p>}
+    <h1>Experiments</h1>
+    <div className="control-panel">
+      <div className="buttons-container">
+      <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
+      <button onClick={handleReturnToApp}>Return to Canvas</button>
+      </div>
+    </div>
     <div className="results">
       <h2>Results</h2>
       {/* Map through the results array to display each experiment's result. */}
