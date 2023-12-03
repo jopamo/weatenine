@@ -1,9 +1,22 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+h1 {
+  font-size: 2em;
+  white-space: nowrap;
 }
 
+p {
+  font-size: 1.5em;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.2em;
+  }
+
+  p {
+    font-size: 1em;
+  }
+}
 
 .intro-animation {
   display: flex;
@@ -11,29 +24,25 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #282c34;
+  background-color: transparent;
   color: #fff;
   text-align: center;
   overflow: hidden;
+  cursor: pointer;
 }
 
-.intro-animation p {
-  font-size: 1.5em;
-  line-height: 1.4;
+.intro-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.pixi-container {
-  width: auto;
-  height: auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.intro-text h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
-@media (max-width: 768px) {
-  .intro-animation p {
-    font-size: 1.2em;
-  }
-
-  .pixi-container {
-    aspect-ratio: 16 / 9;
-  }
+.intro-text p {
+  font-size: 1.2rem;
 }

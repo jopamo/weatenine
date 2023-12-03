@@ -1,38 +1,38 @@
-// Converts string "rgb(255,0,0)" to an array [255, 0, 0].
-const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
-
 const isMixedColor = (color, originalColors) => {
-  // Get RGB values of the color to check
-  const colorRGB = rgbStringToArray(color);
-
-  // Compare with each original color
-  return originalColors.every(originalColor => {
-    const originalRGB = rgbStringToArray(originalColor);
-    return !originalRGB.every((value, index) => value === colorRGB[index]);
-  });
+  return !originalColors.includes(color);
 };
 
-// Calculate mix of two colors
-const mixColors = (colorA, colorB) => {
+function hexToRgbArray(hex) {
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+  return [r, g, b];
+}
+
+const rgbToHex = (r, g, b) => {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+};
+
+export const mixColors = (colorA, colorB) => {
   if (!colorA) return colorB; // If no colorA, return colorB
-  if (!colorB) return colorA;  // If no colorB, return colorA
+  if (!colorB) return colorA; // If no colorB, return colorA
 
-  // Use rgbStringToArray from above
-  const [r1, g1, b1] = rgbStringToArray(colorA);
-  const [r2, g2, b2] = rgbStringToArray(colorB);
+  // Convert hex colors to RGB arrays
+  const [r1, g1, b1] = hexToRgbArray(colorA);
+  const [r2, g2, b2] = hexToRgbArray(colorB);
 
-  // Use a weighted average (20% of the difference) to mix the two
+  // Mix the colors
   const r = Math.round(r1 + 0.2 * (r2 - r1));
   const g = Math.round(g1 + 0.2 * (g2 - g1));
   const b = Math.round(b1 + 0.2 * (b2 - b1));
 
-  // Return the mixed color as an RGB string
-  return `rgb(${r},${g},${b})`;
+  // Convert the resulting RGB values to hexadecimal format and return
+  return rgbToHex(r, g, b);
 };
 
 
 // Check whether a stopping criterion for painting is met
-const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, color3) => {
+export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, color3) => {
   switch (stoppingCriterion) {
     // Criterion: Stop when all squares on the grid are painted at least once
     case 'lastUnpainted':
@@ -81,7 +81,7 @@ const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, color3) 
 
 
 // Initializes 2d array, each cell is an object with color and count properties
-const initializeGrid = (xDimension, yDimension) => {
+export const initializeGrid = (xDimension, yDimension) => {
   // The function takes two arguments:
   // xDimension: Number of columns in the grid
   // yDimension: Number of rows in the grid
@@ -102,7 +102,7 @@ const initializeGrid = (xDimension, yDimension) => {
 
 
 // Paint a random cell in a grid with one of the provided colors
-const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, counts) => {
+export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, counts) => {
   // Select a random x-coordinate within the grid. Math.random()
   // generates a number between 0 (inclusive) and 1 (exclusive)
   // Multiplying by xDimension scales this to the grid width, and
@@ -155,7 +155,7 @@ const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, c
 
 
 // simulate painting the grid according to certain rules
-const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
+export const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
 
   // Init a grid based on given dimensions X (width) and Y (height)
@@ -222,11 +222,15 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   }
 };
 
+
+
+
+
 const X = 10;
 const Y = 10;
-const C1 = 'rgb(255,0,0)';
-const C2 = 'rgb(0,255,0)';
-const C3 = 'rgb(0,0,255)';
+const C1 = '#ff0000';
+const C2 = '#00ff00';
+const C3 = '#0000ff';
 const S = 'allMixedColors';
 
 const result = PAINT_ONCE(X, Y, C1, C2, C3, S);

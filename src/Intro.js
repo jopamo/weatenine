@@ -1,151 +1,19 @@
-import React, { useRef, useEffect } from 'react';
-import * as PIXI from 'pixi.js';
-import { debounce } from 'lodash';
+import React from 'react';
+import Background from './Background';
 import './Intro.css';
 
 function Intro({ setCurrentPage }) {
-  const pixiContainer = useRef(null);
 
-  const titleText = 'Welcome to Random Paint';
-  const infoTextContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aenean et tortor at risus viverra adipiscing at. Ut enim blandit volutpat maecenas volutpat blandit aliquam. Congue eu consequat ac felis donec et odio pellentesque. Adipiscing bibendum est ultricies integer. A erat nam at lectus urna duis convallis convallis tellus.";
-
-  useEffect(() => {
-    const handleToApp = () => {
-      setCurrentPage("app");
-    };
-
-    const app = new PIXI.Application({
-      resizeTo: window,
-      transparent: true,
-    });
-
-    const currentContainer = pixiContainer.current;
-    currentContainer.appendChild(app.view);
-
-    // Background image
-    const bg = PIXI.Sprite.from('texture.jpg');
-    bg.width = app.screen.width;
-    bg.height = app.screen.height;
-    app.stage.addChild(bg);
-
-    let scale = 1;
-    let scaleSpeed = 0.0001;
-
-    const paintSplash = PIXI.Sprite.from('splash.png');
-    paintSplash.anchor.set(0.5);
-    paintSplash.x = app.screen.width / 2;
-    paintSplash.y = app.screen.height / 2;
-    app.stage.addChild(paintSplash);
-
-    const resizeSplash = () => {
-      const scaleX = app.screen.width / paintSplash.texture.width;
-      const scaleY = app.screen.height / paintSplash.texture.height;
-      const coverScale = Math.max(scaleX, scaleY);
-
-      paintSplash.scale.set(coverScale);
-      paintSplash.x = app.screen.width / 2;
-      paintSplash.y = app.screen.height / 2;
-    };
-
-    const blurFilter1 = new PIXI.filters.BlurFilter();
-    const blurFilter2 = new PIXI.filters.BlurFilter();
-    paintSplash.filters = [blurFilter2];
-
-    let count = 0;
-    app.ticker.add(() => {
-      count += 0.005;
-      blurFilter1.blur = 20 * Math.cos(count);
-      blurFilter2.blur = 20 * Math.sin(count);
-
-      scale += scaleSpeed;
-      bg.scale.set(scale);
-
-      // Reset scale after a certain point to create a looping effect
-      if (scale >= 1.50 || scale <= 1.0) {
-        scaleSpeed *= -1;
-      }
-
-      resizeSplash();
-    });
-
-    const textStyle = {
-      fontFamily: 'Arial',
-      fill: 'white',
-      stroke: 'black',
-      strokeThickness: 4,
-      fontSize: Math.max(20, window.innerWidth / 30),
-
-    };
-
-    const titleMessage = new PIXI.Text(titleText, new PIXI.TextStyle(textStyle));
-    titleMessage.anchor.set(0.5);
-    titleMessage.x = app.screen.width / 2;
-    titleMessage.y = 50;
-    app.stage.addChild(titleMessage);
-
-    const infoTextStyle = new PIXI.TextStyle({
-      fontFamily: 'Arial',
-      fontSize: 16,
-      fill: 0x000000,
-      wordWrap: true,
-      wordWrapWidth: 400
-    });
-
-    const infoText = new PIXI.Text(infoTextContent, infoTextStyle);
-    infoText.x = 20;
-    infoText.y = titleMessage.y + 60;
-
-    const background = new PIXI.Graphics();
-    const backgroundWidth = infoText.width ;
-    const backgroundHeight = infoText.height + 50;
-    background.beginFill(0xFFFFFF, 0.3);
-    background.drawRect(0, 0, backgroundWidth, backgroundHeight);
-    background.endFill();
-    background.x = (app.screen.width - backgroundWidth) / 2;
-    background.y = infoText.y - 10;
-
-    app.stage.addChild(background);
-    app.stage.addChild(infoText);
-
-    const resizeElements = () => {
-      if (!app.view) return;
-
-      const newTitleSize = Math.max(20, window.innerWidth / 30);
-      titleMessage.style = new PIXI.TextStyle({ ...textStyle, fontSize: newTitleSize });
-      titleMessage.x = app.screen.width / 2;
-      titleMessage.y = 50;
-
-      background.x = (app.screen.width - backgroundWidth) / 2;
-      background.y = titleMessage.y + 60;
-
-      infoText.style = new PIXI.TextStyle({ ...infoTextStyle, wordWrapWidth: backgroundWidth - 40 });
-      infoText.x = (app.screen.width - infoText.width) / 2;
-      infoText.y = background.y + 10;
-
-      paintSplash.x = app.screen.width / 2;
-      paintSplash.y = app.screen.height / 2;
-      bg.width = app.screen.width;
-      bg.height = app.screen.height;
-    };
-
-    resizeElements();
-
-    const debouncedResizeElements = debounce(resizeElements, 100);
-    window.addEventListener('resize', debouncedResizeElements);
-    currentContainer.addEventListener('click', handleToApp);
-
-    return () => {
-      window.removeEventListener('resize', debouncedResizeElements);
-      currentContainer.removeEventListener('click', handleToApp);
-      currentContainer.removeChild(app.view);
-      app.destroy(true, { children: true, texture: true, baseTexture: true });
-    };
-  }, [setCurrentPage]);
+  const handleToApp = () => {
+    setCurrentPage("app");
+  };
 
   return (
-    <div className="intro-animation">
-      <div ref={pixiContainer} className="pixi-container">
-        {/* Pixi.js canvas will be attached here */}
+    <div className="intro-animation" onClick={handleToApp}>
+      <Background />
+      <div className="intro-text">
+        <h1>Welcome to Random Paint</h1>
+        <p>Touch the screen to continue</p>
       </div>
     </div>
   );

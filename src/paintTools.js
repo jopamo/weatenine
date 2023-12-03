@@ -1,33 +1,33 @@
-// Converts string "rgb(255,0,0)" to an array [255, 0, 0].
-const rgbStringToArray = (str) => str.slice(4, -1).split(',').map(Number);
-
 const isMixedColor = (color, originalColors) => {
-  // Get RGB values of the color to check
-  const colorRGB = rgbStringToArray(color);
-
-  // Compare with each original color
-  return originalColors.every(originalColor => {
-    const originalRGB = rgbStringToArray(originalColor);
-    return !originalRGB.every((value, index) => value === colorRGB[index]);
-  });
+  return !originalColors.includes(color);
 };
 
-// Calculate mix of two colors
-const mixColors = (colorA, colorB) => {
+function hexToRgbArray(hex) {
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+  return [r, g, b];
+}
+
+const rgbToHex = (r, g, b) => {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+};
+
+export const mixColors = (colorA, colorB) => {
   if (!colorA) return colorB; // If no colorA, return colorB
-  if (!colorB) return colorA;  // If no colorB, return colorA
+  if (!colorB) return colorA; // If no colorB, return colorA
 
-  // Use rgbStringToArray from above
-  const [r1, g1, b1] = rgbStringToArray(colorA);
-  const [r2, g2, b2] = rgbStringToArray(colorB);
+  // Convert hex colors to RGB arrays
+  const [r1, g1, b1] = hexToRgbArray(colorA);
+  const [r2, g2, b2] = hexToRgbArray(colorB);
 
-  // Use a weighted average (20% of the difference) to mix the two
+  // Mix the colors
   const r = Math.round(r1 + 0.2 * (r2 - r1));
   const g = Math.round(g1 + 0.2 * (g2 - g1));
   const b = Math.round(b1 + 0.2 * (b2 - b1));
 
-  // Return the mixed color as an RGB string
-  return `rgb(${r},${g},${b})`;
+  // Convert the resulting RGB values to hexadecimal format and return
+  return rgbToHex(r, g, b);
 };
 
 

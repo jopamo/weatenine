@@ -21,9 +21,9 @@ function Experiments({ setCurrentPage }) {
   const [errorMessage, setErrorMessage] = useState(""); // To display any error messages
   const [results, setResults] = useState([]); // Array to store the results of experiments
 
-  const defaultColor1 = "rgb(255, 0, 0)"; // Red
-  const defaultColor2 = "rgb(0, 255, 0)"; // Green
-  const defaultColor3 = "rgb(0, 0, 255)"; // Blue
+  const defaultColor1 = "#ff0000"; // Red
+  const defaultColor2 = "#00ff00"; // Green
+  const defaultColor3 = "#0000ff"; // Blue
 
   // Function to handle running an experiment. Wrapped in 'useCallback'
   // to prevent unnecessary re-renders

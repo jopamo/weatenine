@@ -6,6 +6,9 @@ html, body {
 }
 
 .App {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
   padding: 20px;
@@ -103,8 +106,16 @@ button:disabled {
 }
 
 .canvas-container {
-  position: relative;
-  z-index: 2;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.paintCanvas {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .color-counts {
@@ -121,6 +132,9 @@ button:disabled {
   width: auto;
   font-size: 10px;
   margin: 0;
+  flex-grow: 1;
+  width: 100%;
+  height: auto;
 }
 
 .color-counts th, .color-counts td {
@@ -163,4 +177,3 @@ button:disabled {
     margin-right: 0;
   }
 }
-
