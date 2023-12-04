@@ -14,13 +14,18 @@ function App({ setCurrentPage }) {
 
   const calculateInitialDimensions = () => {
     const width = window.innerWidth;
+
     const xDimension = Math.floor(width / cellSize);
     const yDimension = Math.floor(window.innerHeight / cellSize);
+
+    //const xDimension = 2;
+    //const yDimension = 2;
 
     return { xDimension, yDimension };
   };
 
-  const handleContinue = () => {
+  const handleContinue = (e) => {
+    e.preventDefault();
     setCurrentPage('experiments');
   };
 
@@ -34,11 +39,6 @@ function App({ setCurrentPage }) {
   const [isPainting, setIsPainting] = useState(false);
   const [dropSpeed, setDropSpeed] = useState(50);
   const [colorCounts, setColorCounts] = useState({ totalColor1: 0, totalColor2: 0, totalColor3: 0 });
-
-  useEffect(() => {
-    setGrid(initializeGrid(dimensions.xDimension, dimensions.yDimension));
-  }, [dimensions]);
-
 
   useEffect(() => {
   const debouncedHandleResize = debounce(() => {
@@ -81,6 +81,8 @@ function App({ setCurrentPage }) {
   }, [dimensions, drawGrid]);
 
   const resetBoardAndCounts = useCallback(() => {
+    //console.log("Resetting board and counts");
+
     const initialGrid = initializeGrid(dimensions.xDimension, dimensions.yDimension);
     setGrid(initialGrid);
 
@@ -95,6 +97,8 @@ function App({ setCurrentPage }) {
 
   const paintAndCheck = useCallback(() => {
     if (!isPaintingRef.current) return;
+
+    //console.log("Painting cell");
 
     const { grid: updatedGrid, paintedCell } = paintRandomCell(grid, dimensions.xDimension, dimensions.yDimension, color1, color2, color3, colorCounts);
 
@@ -112,9 +116,11 @@ function App({ setCurrentPage }) {
 
     const result = checkStoppingCriteria(updatedGrid, stoppingCriterion, color1, color2, color3);
     if (result.met) {
-        clearInterval(paintingIntervalRef.current);
-        setIsPainting(false);
-        setStoppingCriteriaMessage(result.message);
+      //console.log("Stopping criteria met:", result.message);
+
+      clearInterval(paintingIntervalRef.current);
+      setIsPainting(false);
+      setStoppingCriteriaMessage(result.message);
     }
 }, [grid, dimensions, color1, color2, color3, colorCounts, stoppingCriterion]);
 
@@ -128,7 +134,7 @@ function App({ setCurrentPage }) {
 
   const startPainting = () => {
     resetBoardAndCounts();
-    console.log("Starting painting");
+    //console.log("Starting painting");
     isPaintingRef.current = true;
     setIsPainting(true);
 
@@ -152,10 +158,13 @@ function App({ setCurrentPage }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (dimensions.xDimension <= 0 || dimensions.yDimension <= 0) {
       alert("Dimensions cannot be negative or zero!");
       return;
     }
+
+    //console.log("Form submitted, starting painting");
     startPainting();
   };
 

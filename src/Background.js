@@ -60,7 +60,7 @@ function Background({ onBackgroundClick }) {
       resizeSplash();
     });
 
-    const debouncedResizeElements = debounce(resizeSplash, 100);
+    const debouncedResizeElements = debounce(resizeSplash, 250);
     window.addEventListener('resize', debouncedResizeElements);
     currentContainer.addEventListener('click', onBackgroundClick);
 
