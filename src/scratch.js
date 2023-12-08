@@ -1,3 +1,6 @@
+const MAX_INT_VALUE = 99;
+const maxValues = 99;
+
 const isMixedColor = (color, originalColors) => {
   const mixed = !originalColors.includes(color);
   //console.log(`isMixedColor: color = ${color}, is mixed = ${mixed}`);
@@ -236,22 +239,214 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   }
 };
 
+function checkInput(str, maxValues) {
+  let previousValue = null;
+  let values = [];
+
+  try {
+    const stringValues = str.split(/[\s,]+/).filter(Boolean);
+
+    if (stringValues.length === 0) {
+      throw new Error("No input provided. Please enter a list of numbers.");
+    }
+
+    if (stringValues.length > maxValues) {
+      throw new Error(`Too many values. Only a maximum of ${maxValues} different values are allowed.`);
+    }
+
+    for (let i = 0; i < stringValues.length; i++) {
+      const stringValue = stringValues[i];
+      const intValue = parseInt(stringValue, 10);
+
+      if (isNaN(intValue) || intValue.toString() !== stringValue) {
+        throw new Error(`Invalid number: '${stringValue}' is not a valid integer at position ${i + 1}.`);
+      }
+      if (intValue > MAX_INT_VALUE) {
+        throw new Error(`Value exceeds maximum limit: '${intValue}' at position ${i + 1} must be less than or equal to ${MAX_INT_VALUE}.`);
+      }
+      if (intValue < previousValue) {
+        throw new Error(`Invalid sequence: ${intValue} is not greater than ${previousValue} at position ${i + 1}.`);
+      }
+      previousValue = intValue;
+      values.push(intValue);
+    }
+  }
+  catch (error) {
+    return { error: error.message, values: null };
+  }
+
+  return { values: values, error: null };
+}
+
+function PAINT_MANY(X, Y, C1, C2, C3, S, R) {
+  // Log the settings used
+  console.log('PAINT_MANY executed with these Settings:');
+  console.log('X:', X);
+  console.log('Y:', Y);
+  console.log('C1:', C1);
+  console.log('C2:', C2);
+  console.log('C3:', C3);
+  console.log('S:', S);
+  console.log('R:', R);
+
+  let stats = {
+    A: { min: Infinity, max: 0, total: 0 },
+    A1: { min: Infinity, max: 0, total: 0 },
+    A2: { min: Infinity, max: 0, total: 0 },
+    A3: { min: Infinity, max: 0, total: 0 },
+    B: { min: Infinity, max: 0, total: 0 },
+    C: { min: Infinity, max: 0, total: 0 }
+  };
+
+  for (let i = 0; i < R; i++) {
+    const result = PAINT_ONCE(X, Y, C1, C2, C3, S);
+    const { totalDrops, totalColor1, totalColor2, totalColor3, squareMostDrops, averageTotal } = result.counts;
+
+    // Update stats for A, A1, A2, A3, B, C
+    updateStats(stats, 'A', totalDrops);
+    updateStats(stats, 'A1', totalColor1);
+    updateStats(stats, 'A2', totalColor2);
+    updateStats(stats, 'A3', totalColor3);
+    updateStats(stats, 'B', squareMostDrops);
+    updateStats(stats, 'C', averageTotal);
+  }
+
+  // Compute averages
+  computeAverages(stats, R);
+
+  return stats;
+}
+
+// Update min, max, and total for a given metric
+function updateStats(stats, metric, value) {
+  stats[metric].min = Math.min(stats[metric].min, value);
+  stats[metric].max = Math.max(stats[metric].max, value);
+  stats[metric].total += value;
+}
+
+// Compute averages for each metric
+function computeAverages(stats, R) {
+  for (const key in stats) {
+    stats[key].average = stats[key].total / R;
+    delete stats[key].total; // Remove the total property after computing the average
+  }
+}
+
+function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX, fixedY, fixedR) {
+  console.log('runExperiments executed with these Settings:');
+  console.log('C1:', C1);
+  console.log('C2:', C2);
+  console.log('C3:', C3);
+  console.log('S:', S);
+
+  // Results container
+  const results = [];
+
+  // Iterate over each value of the independent variable
+  values.forEach(value => {
+    let X, Y, R;
+
+    // Determine X, Y, and R based on the independent variable type
+    if (independentVarType === 'D') {
+      X = Y = value;
+      R = fixedR;
+    } else if (independentVarType === 'X') {
+      X = value;
+      Y = fixedY;
+      R = fixedR;
+    } else if (independentVarType === 'R') {
+      X = fixedX;
+      Y = fixedY;
+      R = value;
+    }
+
+    // Run PAINT_MANY for the calculated number of iterations
+    for (let i = 0; i < R; i++) {
+      const paintResults = PAINT_MANY(X, Y, C1, C2, C3, S, R);
+      results.push(paintResults);
+    }
+  });
+
+  console.log('Experiment Results:', results);
+  return results;
+}
+
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function genArray(count) {
+  return Array.from({ length: count }, (_, i) => i + 1).join(", ");
+}
+
+function genInvalidMaxValue() {
+  return `1, 2, 3, ${MAX_INT_VALUE + 1}`;
+}
+
+const testInputs = [
+  genArray(maxValues), // valid array of maxValues size
+  genArray(maxValues + 1), //invalid +1 from valid
+  genInvalidMaxValue(), //invalid +1 over max int value
+  "1 2 3", // valid
+  "1    2   3", // (Test 5) valid, handle spaces
+  "1,3,2", // invalid order
+  "1, three, 4, 5", // invalid
+  "#!@#$&", // invalid
+  "", // invalid empty error
+  "5", // (Test 10) valid
+  "1, 2, three, 4, !@#", // invalid - special mix
+  "1,,2,,3", // valid - multiple commas
+  "1 2,3 4", // valid - mixed spaces and commas
+  "1\t2\t3", // valid - handle tab-separated values
+  "-1, -2, -3", // (Test 15) negative numbers
+  "1.5, 2.5, 3.5", // decimal numbers (invalid)
+  "1e3, 2e3, 3e3", // scientific notation (invalid)
+  "1 2\n3", // newline character (valid)
+  "0, 1, 2", // including zero
+  "1, 2, 2", // (Test 20) duplicate valid number
+  " , ", // only spaces and commas
+  "1,2,3,4,4,5,6", // valid
+  "a, b, c", // only letters
+  "1, 2, 2.5, 3" // (Test 24) mixed integers and decimals (invalid)
+];
+
+/*// Run tests
+testInputs.forEach((input, index) => {
+  const result = checkInput(input, maxValues);
+
+  console.log(`Test ${index + 1}: Input = "${input}"`);
+
+  if (result.error) {
+    console.log(`Error: ${result.error}`);
+  }
+  else {
+    console.log(`Validated Values: ${result.values}`);
+    console.log(`result object: ${result}`);
+  }
+  console.log('-----------------------');
+});
+*/
+
+// Define independent variable arrays
+const parsedValues = [2, 2];
 
 
-const X = 10;
-const Y = 10;
-const C1 = '#ff0000';
-const C2 = '#00ff00';
-const C3 = '#0000ff';
+const C1 = getRandomColor();
+const C2 = getRandomColor();
+const C3 = getRandomColor();
 const S = 'allMixedColors';
+const fixedY = 10;
+const fixedX = 10;
+const fixedR = 2;
 
-const result = PAINT_ONCE(X, Y, C1, C2, C3, S);
+// Run the experiments
+//const paintManyResults = PAINT_MANY(fixedX, fixedY, C1, C2, C3, S, fixedR);
+//console.log("PAINT_MANY Results:", JSON.stringify(paintManyResults, null, 2));
 
-console.log("Total drops of Color 1:", result.counts.totalColor1);
-console.log("Total drops of Color 2:", result.counts.totalColor2);
-console.log("Total drops of Color 3:", result.counts.totalColor3);
-console.log("Total paint drops:", result.counts.totalDrops);
-console.log("Average drops per square:", result.counts.averageTotal);
-console.log("Number of uniquely painted cells:", result.counts.paintedCells);
-console.log("Square with most drops:", result.counts.squareMostDropsLocation, "with", result.counts.squareMostDrops, "drops");
-console.log(result.stopMessage.message);
+const experimentResults = runExperiments('D', parsedValues, C1, C2, C3, S, fixedX, fixedY, fixedR);
+//console.log("Complete Experiment Results:", JSON.stringify(experimentResults, null, 2));
