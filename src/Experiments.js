@@ -1,118 +1,293 @@
-// Import necessary hooks and components from React and other files
-import React, { useState, useEffect, useCallback } from 'react';
-import { PAINT_ONCE } from './paintTools';
+import React, { useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { runPaintManyExperiments, checkInput } from './paintTools';
 import Background from './Background';
-import './Experiments.css'; // Importing CSS for styling
+import './Experiments.css';
 
-// Define the Experiments component. It receives 'setCurrentPage' as a prop for navigation
-function Experiments({ setCurrentPage }) {
-  // A function to handle returning to the main app. It changes the current page using 'setCurrentPage'
-  const handleReturnToApp = () => {
-    setCurrentPage("app");
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+function Experiments() {
+  const [experimentSettings, setExperimentSettings] = useState({
+    independentVar: 'D',
+    inputValues: '',
+    color1: '#ff0000',
+    color2: '#00ff00',
+    color3: '#0000ff',
+    stoppingCriterion: 'allMixedColors',
+    fixedX: 10,
+    fixedY: 10,
+    fixedR: 5
+  });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [chartData, setChartData] = useState(null);
+  const [showGraphs, setShowGraphs] = useState(false);
+  const [isComputing, setIsComputing] = useState(false);
+
+  const chartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            size: 14
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(255,255,255,0.8)'
+        }
+      },
+      y: {
+        grid: {
+          color: 'rgba(255,255,255,0.8)'
+        }
+      }
+    },
+    elements: {
+      line: {
+        borderWidth: 3
+      },
+      point: {
+        radius: 5
+      }
+    },
+    maintainAspectRatio: false,
+    responsive: true
   };
 
-  // State variables for the component.
-  // Tracks the independent variable for experiments
-  const [independentVar, setIndependentVar] = useState("");
-  const [values, setValues] = useState(""); // Stores the values entered by the user
-  const [fixedY, setFixedY] = useState(""); // Stores a fixed value for Y dimension
-  // Stores a fixed value for R (radius or another variable)
-  const [fixedR, setFixedR] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // To display any error messages
-  const [results, setResults] = useState([]); // Array to store the results of experiments
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setExperimentSettings(prevSettings => ({
+      ...prevSettings,
+      [name]: value
+    }));
+  };
 
-  const defaultColor1 = "#ff0000"; // Red
-  const defaultColor2 = "#00ff00"; // Green
-  const defaultColor3 = "#0000ff"; // Blue
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  const { independentVar, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR } = experimentSettings;
 
-  // Function to handle running an experiment. Wrapped in 'useCallback'
-  // to prevent unnecessary re-renders
-  const handleRunExperiment = useCallback(() => {
-    setResults([]); // Reset results before running a new experiment
+  // Check and parse inputValues
+  const inputValues = experimentSettings.inputValues;
+  let parsedValues;
+  if (typeof inputValues === 'string') {
+    parsedValues = inputValues.split(',').map(value => value.trim());
+  } else if (Array.isArray(inputValues)) {
+    parsedValues = inputValues; // Use as-is if it's already an array
+  } else {
+    setErrorMessage('Invalid input values');
+    return;
+  }
 
-    // Convert the entered values to an array of numbers
-    const inputValues = values.split(',').map(Number);
+  // Check for errors after parsing
+  let { error } = checkInput(parsedValues);
+  if (error) {
+    setErrorMessage(error);
+    return;
+  }
+  setErrorMessage('');
 
-    // Process each value to run the experiment
-    inputValues.forEach(value => {
-      let X, Y, R;
+  setIsComputing(true);
+  const experimentResults = runPaintManyExperiments(independentVar, parsedValues, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
+  setChartData(experimentResults);
+  setIsComputing(false);
+};
 
-      // Determine the parameters for the experiment based on the independent variable chosen
-      switch (independentVar) {
-        case "D":
-          X = Y = value; // For 'D' case, set both X and Y to the input value
-          R = parseInt(fixedR, 10);
-          break;
-        case "X":
-          X = value; // Set X to the input value and Y to a fixed value
-          Y = parseInt(fixedY, 10);
-          R = parseInt(fixedR, 10);
-          break;
-        case "R":
-          // For 'R', assuming a square canvas and setting both X and Y
-          X = Y = parseInt(values, 10);
-          R = value;
-          break;
-        default:
-          // Set error message if the variable is invalid
-          setErrorMessage("Invalid independent variable");
-          return;
-      }
 
-      const stoppingCriterion = "allMixedColors";
 
-      // Run the paint experiment with the determined parameters
-      const experimentResult = PAINT_ONCE(X, Y, defaultColor1, defaultColor2, defaultColor3, stoppingCriterion);
+  const renderResultsTable = () => {
+    if (!chartData || showGraphs || isComputing) return null;
 
-      // Add the result of the experiment to the results array
-      setResults(prevResults => [...prevResults, { X, Y, R, stoppingCriterion, ...experimentResult }]);
-    });
+    return (
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Independent Value</th>
+              {chartData.datasets.map((dataset, index) => (
+                <th key={index}>{dataset.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {chartData.labels.map((label, labelIndex) => (
+              <tr key={labelIndex}>
+                <td>{label}</td>
+                {chartData.datasets.map((dataset, datasetIndex) => (
+                  <td key={datasetIndex}>{dataset.data[labelIndex]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={() => setShowGraphs(true)}>Continue</button>
+      </div>
+    );
+  };
 
-    setErrorMessage(""); // Clear any error messages after running the experiment
-  }, [values, independentVar, fixedY, fixedR]); // Dependencies for useCallback
+  const renderComputationProgress = () => {
+    if (!isComputing) return null;
 
-  // useEffect to set default values and run the experiment when the component mounts
-  useEffect(() => {
-    setIndependentVar("D");
-    setValues("10");
-    setFixedY("10");
-    setFixedR("1");
-    handleRunExperiment();
-  }, [handleRunExperiment]); // Dependency array
+    return (
+      <div>
+        <p>Computing results, please wait...</p>
+      </div>
+    );
+  };
 
-  // Render the component
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   return (
-  <div className="Experiments">
-    <Background />
-    <h1>Experiments</h1>
-    <div className="control-panel">
-      <div className="buttons-container">
-      <button onClick={handleRunExperiment} className="button-spacing">Run Experiments</button>
-      <button onClick={handleReturnToApp}>Return to Canvas</button>
-      </div>
-    </div>
-    <div className="results">
-      <h2>Results</h2>
-      {/* Map through the results array to display each experiment's result. */}
-      {results.map((result, index) => (
-        <div key={index} className="result-item">
-          <p>Experiment {index + 1}:</p>
-          {/* Display details of the experiment result. */}
-          <p>X: {result.X}, Y: {result.Y}, R: {result.R}</p>
-            <p>Uniquely Painted Cells: {result.counts.paintedCells}</p>
-            <p>Total Drops: {result.counts.totalDrops}</p>
-            <p>Stopping Criterion (S): {result.stoppingCriterion}</p>
-            <p>Total Color 1 Drops: {result.counts.totalColor1}</p>
-            <p>Total Color 2 Drops: {result.counts.totalColor2}</p>
-            <p>Total Color 3 Drops: {result.counts.totalColor3}</p>
-            <p>Square with Most Drops: {result.counts.squareMostDrops}</p>
-            <p>Average Drops Per Square: {result.counts.averageTotal}</p>
+    <div className="Experiments">
+      <Background />
+      <h1>Experiment Configuration</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            Independent Variable:
+            <select
+              name="independentVar"
+              value={experimentSettings.independentVar}
+              onChange={handleInputChange}
+            >
+              <option value="D">D (Square Canvas Dimension)</option>
+              <option value="X">X (X-Dimension with constant Y)</option>
+              <option value="R">R (Number of Repetitions)</option>
+            </select>
+          </label>
+        </div>
+        <div>
+          <label>
+            Values:
+            <input
+              type="text"
+              name="inputValues"
+              value={experimentSettings.inputValues}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        {experimentSettings.independentVar === 'D' && (
+          <div>
+            <label>
+              Number of Repetitions:
+              <input
+                type="number"
+                name="fixedR"
+                value={experimentSettings.fixedR}
+                onChange={handleInputChange}
+              />
+            </label>
           </div>
-        ))}
-      </div>
+        )}
+        {experimentSettings.independentVar === 'X' && (
+          <div>
+            <label>
+              Fixed Y Dimension:
+              <input
+                type="number"
+                name="fixedY"
+                value={experimentSettings.fixedY}
+                onChange={handleInputChange}
+              />
+            </label>
+            <label>
+              Number of Repetitions:
+              <input
+                type="number"
+                name="fixedR"
+                value={experimentSettings.fixedR}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
+        )}
+        {experimentSettings.independentVar === 'R' && (
+          <div>
+            <label>
+              Fixed X Dimension:
+              <input
+                type="number"
+                name="fixedX"
+                value={experimentSettings.fixedX}
+                onChange={handleInputChange}
+              />
+            </label>
+            <label>
+              Fixed Y Dimension:
+              <input
+                type="number"
+                name="fixedY"
+                value={experimentSettings.fixedY}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
+        )}
+        <div>
+          <label>Color 1:
+            <input
+              type="color"
+              name="color1"
+              value={experimentSettings.color1}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>Color 2:
+            <input
+              type="color"
+              name="color2"
+              value={experimentSettings.color2}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>Color 3:
+            <input
+              type="color"
+              name="color3"
+              value={experimentSettings.color3}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Stopping Criterion:
+            <select
+              name="stoppingCriterion"
+              value={experimentSettings.stoppingCriterion}
+              onChange={handleInputChange}
+            >
+              <option value="lastUnpainted">Last Unpainted Square</option>
+              <option value="secondBlob">Second Paint Blob on a Square</option>
+              <option value="allMixedColors">Entire Board Mixed Colors</option>
+            </select>
+          </label>
+        </div>
+        {errorMessage && <p className="error">{errorMessage}</p>}
+        <button type="submit">Run Experiments</button>
+      </form>
+
+      <h1>Experiment Results</h1>
+      {renderComputationProgress()}
+      {renderResultsTable()}
+      {showGraphs && chartData && chartData.datasets.map((dataset, index) => (
+        <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
+          <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
+        </div>
+      ))}
     </div>
   );
-
 }
 
 export default Experiments;

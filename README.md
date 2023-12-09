@@ -117,6 +117,6 @@ git push
 
 ### 🎈 Conclusion
 
-Thanks for using the Random Paint Drops Simulation website.
+Thanks for using the Random Paint
 
 ---

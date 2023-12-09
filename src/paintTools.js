@@ -1,3 +1,6 @@
+const MAX_INT_VALUE = 99;
+const maxValues = 99;
+
 const isMixedColor = (color, originalColors) => {
   const mixed = !originalColors.includes(color);
   //console.log(`isMixedColor: color = ${color}, is mixed = ${mixed}`);
@@ -167,7 +170,7 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
 
 
 // simulate painting the grid according to certain rules
-export const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
+const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
 
   // Init a grid based on given dimensions X (width) and Y (height)
@@ -235,3 +238,161 @@ export const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
     }
   }
 };
+
+export function checkInput(str, maxValues) {
+  let previousValue = null;
+  let values = [];
+
+  try {
+    const stringValues = str.split(/[\s,]+/).filter(Boolean);
+
+    if (stringValues.length === 0) {
+      throw new Error("No input provided. Please enter a list of numbers.");
+    }
+
+    if (stringValues.length > maxValues) {
+      throw new Error(`Too many values. Only a maximum of ${maxValues} different values are allowed.`);
+    }
+
+    for (let i = 0; i < stringValues.length; i++) {
+      const stringValue = stringValues[i];
+      const intValue = parseInt(stringValue, 10);
+
+      if (isNaN(intValue) || intValue.toString() !== stringValue) {
+        throw new Error(`Invalid number: '${stringValue}' is not a valid integer at position ${i + 1}.`);
+      }
+      if (intValue > MAX_INT_VALUE) {
+        throw new Error(`Value exceeds maximum limit: '${intValue}' at position ${i + 1} must be less than or equal to ${MAX_INT_VALUE}.`);
+      }
+      if (intValue < previousValue) {
+        throw new Error(`Invalid sequence: ${intValue} is not greater than ${previousValue} at position ${i + 1}.`);
+      }
+      previousValue = intValue;
+      values.push(intValue);
+    }
+  }
+  catch (error) {
+    return { error: error.message, values: null };
+  }
+
+  return { values: values, error: null };
+}
+
+function PAINT_MANY(X, Y, C1, C2, C3, S, R) {
+  // Log the settings used
+  console.log('PAINT_MANY executed with these Settings:');
+  console.log('X:', X);
+  console.log('Y:', Y);
+  console.log('C1:', C1);
+  console.log('C2:', C2);
+  console.log('C3:', C3);
+  console.log('S:', S);
+  console.log('R:', R);
+
+  let stats = {
+    A: { min: Infinity, max: 0, total: 0 },
+    A1: { min: Infinity, max: 0, total: 0 },
+    A2: { min: Infinity, max: 0, total: 0 },
+    A3: { min: Infinity, max: 0, total: 0 },
+    B: { min: Infinity, max: 0, total: 0 },
+    C: { min: Infinity, max: 0, total: 0 }
+  };
+
+  for (let i = 0; i < R; i++) {
+    const result = PAINT_ONCE(X, Y, C1, C2, C3, S);
+    const { totalDrops, totalColor1, totalColor2, totalColor3, squareMostDrops, averageTotal } = result.counts;
+
+    // Update stats for A, A1, A2, A3, B, C
+    updateStats(stats, 'A', totalDrops);
+    updateStats(stats, 'A1', totalColor1);
+    updateStats(stats, 'A2', totalColor2);
+    updateStats(stats, 'A3', totalColor3);
+    updateStats(stats, 'B', squareMostDrops);
+    updateStats(stats, 'C', averageTotal);
+  }
+
+  // Compute averages
+  computeAverages(stats, R);
+
+  return stats;
+}
+
+// Update min, max, and total for a given metric
+function updateStats(stats, metric, value) {
+  stats[metric].min = Math.min(stats[metric].min, value);
+  stats[metric].max = Math.max(stats[metric].max, value);
+  stats[metric].total += value;
+}
+
+// Compute averages for each metric
+function computeAverages(stats, R) {
+  for (const key in stats) {
+    stats[key].average = stats[key].total / R;
+    delete stats[key].total; // Remove the total property after computing the average
+  }
+}
+
+export function runPaintManyExperiments(independentVarType, values, C1, C2, C3, S, fixedX, fixedY, fixedR) {
+  console.log('runPaintManyExperiments executed with these Settings:');
+  console.log('C1:', C1);
+  console.log('C2:', C2);
+  console.log('C3:', C3);
+  console.log('S:', S);
+
+  const labels = values; // Values of the independent variable as labels
+  const datasets = [];
+
+  // Metrics to be plotted
+  const metrics = ['A', 'A1', 'A2', 'A3', 'B', 'C'];
+  const metricProperties = ['min', 'max', 'average'];
+
+  // Prepare datasets for each metric property
+  metrics.forEach(metric => {
+    metricProperties.forEach(property => {
+      const dataset = {
+        label: `${metric} (${property})`,
+        data: [],
+        fill: false,
+        borderColor: getRandomColor(),
+        tension: 0.1
+      };
+
+      // Iterate over each value of the independent variable
+      values.forEach(value => {
+        let X, Y, R;
+
+        if (independentVarType === 'D') {
+          X = Y = value;
+          R = fixedR;
+        } else if (independentVarType === 'X') {
+          X = value;
+          Y = fixedY;
+          R = fixedR;
+        } else if (independentVarType === 'R') {
+          X = fixedX;
+          Y = fixedY;
+          R = value;
+        }
+
+        // Run PAINT_MANY R times
+        for (let i = 0; i < R; i++) {
+          const results = PAINT_MANY(X, Y, C1, C2, C3, S, R);
+          dataset.data.push(results[metric][property]);
+        }
+      });
+
+      datasets.push(dataset);
+    });
+  });
+
+  return { labels, datasets };
+}
+
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
