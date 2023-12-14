@@ -1,5 +1,4 @@
 const MAX_INT_VALUE = 99;
-const maxValues = 99;
 
 const isMixedColor = (color, originalColors) => {
   const mixed = !originalColors.includes(color);
@@ -278,6 +277,7 @@ export function checkInput(str, maxValues) {
   return { values: values, error: null };
 }
 
+
 function PAINT_MANY(X, Y, C1, C2, C3, S, R) {
   // Log the settings used
   console.log('PAINT_MANY executed with these Settings:');
@@ -332,67 +332,41 @@ function computeAverages(stats, R) {
   }
 }
 
-export function runPaintManyExperiments(independentVarType, values, C1, C2, C3, S, fixedX, fixedY, fixedR) {
-  console.log('runPaintManyExperiments executed with these Settings:');
+export function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX, fixedY, fixedR) {
+  console.log('runExperiments executed with these Settings:');
   console.log('C1:', C1);
   console.log('C2:', C2);
   console.log('C3:', C3);
   console.log('S:', S);
 
-  const labels = values; // Values of the independent variable as labels
-  const datasets = [];
+  // Results container
+  const results = [];
 
-  // Metrics to be plotted
-  const metrics = ['A', 'A1', 'A2', 'A3', 'B', 'C'];
-  const metricProperties = ['min', 'max', 'average'];
+  // Iterate over each value of the independent variable
+  values.forEach(value => {
+    let X, Y, R;
 
-  // Prepare datasets for each metric property
-  metrics.forEach(metric => {
-    metricProperties.forEach(property => {
-      const dataset = {
-        label: `${metric} (${property})`,
-        data: [],
-        fill: false,
-        borderColor: getRandomColor(),
-        tension: 0.1
-      };
+    // Determine X, Y, and R based on the independent variable type
+    if (independentVarType === 'D') {
+      X = Y = value;
+      R = fixedR;
+    } else if (independentVarType === 'X') {
+      X = value;
+      Y = fixedY;
+      R = fixedR;
+    } else if (independentVarType === 'R') {
+      X = fixedX;
+      Y = fixedY;
+      R = value;
+    }
 
-      // Iterate over each value of the independent variable
-      values.forEach(value => {
-        let X, Y, R;
-
-        if (independentVarType === 'D') {
-          X = Y = value;
-          R = fixedR;
-        } else if (independentVarType === 'X') {
-          X = value;
-          Y = fixedY;
-          R = fixedR;
-        } else if (independentVarType === 'R') {
-          X = fixedX;
-          Y = fixedY;
-          R = value;
-        }
-
-        // Run PAINT_MANY R times
-        for (let i = 0; i < R; i++) {
-          const results = PAINT_MANY(X, Y, C1, C2, C3, S, R);
-          dataset.data.push(results[metric][property]);
-        }
-      });
-
-      datasets.push(dataset);
-    });
+    // Run PAINT_MANY for the calculated number of iterations
+    for (let i = 0; i < R; i++) {
+      const paintResults = PAINT_MANY(X, Y, C1, C2, C3, S, R);
+      results.push(paintResults);
+    }
   });
 
-  return { labels, datasets };
-}
-
-function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+  console.log('Experiment Results:', results);
+  return results;
 }

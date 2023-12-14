@@ -433,7 +433,7 @@ testInputs.forEach((input, index) => {
 */
 
 // Define independent variable arrays
-const parsedValues = [2, 2];
+const parsedValues = [1, 2, 3];
 
 
 const C1 = getRandomColor();
@@ -449,4 +449,5 @@ const fixedR = 2;
 //console.log("PAINT_MANY Results:", JSON.stringify(paintManyResults, null, 2));
 
 const experimentResults = runExperiments('D', parsedValues, C1, C2, C3, S, fixedX, fixedY, fixedR);
-//console.log("Complete Experiment Results:", JSON.stringify(experimentResults, null, 2));
+
+console.log("Complete Experiment Results:", JSON.stringify(experimentResults, null, 2));

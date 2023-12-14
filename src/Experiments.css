@@ -8,214 +8,117 @@ html, body {
 .Experiments {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
-  padding: 20px;
-  text-align: center;
-  background-color: transparent;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.control-panel {
-  margin-bottom: 20px;
+  font-family
+: 'Arial', sans-serif;
+padding: 20px;
+text-align: center;
+background-color: transparent;
+color: #fff;
 }
 
 .settings-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 100%;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
-  width: 100%;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+margin: 10px;
+width: 100%;
 }
 
 label {
-  display: inline-block;
-  margin-right: 10px;
-  color: white;
-  text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
+display: inline-block;
+margin-right: 10px;
+color: white;
+text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
-input[type="number"], select, input[type="range"] {
-  padding: 5px;
-  background-color: #333;
-  color: #ddd;
-  border: 1px solid #555;
-  border-radius: 4px;
-  width: auto;
-}
-
-input[type="range"] {
-  cursor: pointer;
+input[type="number"], select {
+padding: 5px;
+background-color: #333;
+color: #ddd;
+border: 1px solid #555;
+border-radius: 4px;
 }
 
 .buttons-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  margin-top: 20px;
+display: flex;
+justify-content: center;
+gap: 10px;
+width: 100%;
+margin-top: 20px;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  background-color: #007BFF;
-  color: white;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+padding: 10px 20px;
+font-size: 16px;
+cursor: pointer;
+border: none;
+background-color: #007BFF;
+color: white;
+border-radius: 4px;
+transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #0056b3;
+background-color: #0056b3;
 }
 
 button:disabled {
-  background-color: #555;
-  cursor: not-allowed;
-}
-
-.canvas-container {
-  margin-bottom: 20px;
-}
-
-.stopping-criteria-message p {
-  margin-top: 10px;
-  color: #ffcc00;
-}
-
-.canvas-and-chart-container {
-  position: relative;
-}
-
-.canvas-container {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.paintCanvas {
-  max-width: 100%;
-  max-height: 100%;
-}
-
-.color-counts {
-  position: absolute;
-  left: -25px;
-  top: -12px;
-  z-index: 3;
-  background-color: transparent;
-  border-radius: 4px;
-  padding: 10px;
-}
-
-.color-counts table {
-  width: auto;
-  font-size: 10px;
-  margin: 0;
-  flex-grow: 1;
-  width: 100%;
-  height: auto;
-}
-
-.color-counts th, .color-counts td {
-  background-color: #000;
-  border: 1px solid #555;
-  padding: 5px;
-  text-align: center;
-}
-
-.color-counts th {
-  background-color: #000;
-}
-
-.color-swatch {
-  width: 30px;
-  height: 15px;
-}
-
-.outlined-text {
-  color: white;
-  text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
-}
-@media (min-width: 768px) {
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-
-  .form-group {
-    flex: 1;
-    margin-right: 10px;
-  }
-
-  .form-group:last-child {
-    margin-right: 0;
-  }
-}
-
-
-.results {
-  margin-top: 20px;
-}
-
-.result-item {
-  background-color: #333;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-.result-item p {
-  color: #ddd;
-  margin: 5px 0;
+background-color: #555;
+cursor: not-allowed;
 }
 
 .chart-small, .chart-fullscreen {
-  background-color: rgba(255, 255, 255, 0.9); /* Opaque white background */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Adding a subtle shadow for depth */
-  padding: 15px;
-  border-radius: 8px;
+background-color: rgba(255, 255, 255, 0.9); /* Opaque white background /
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); / Adding a subtle shadow for depth */
+padding: 15px;
+border-radius: 8px;
 }
 
 .chart-small {
-  width: 300px;
-  height: 300px;
-  margin: auto;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out;
+width: 300px;
+height: 300px;
+margin: auto;
+cursor: pointer;
+transition: transform 0.3s ease-in-out;
 }
 
 .chart-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  cursor: pointer;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 1000;
+cursor: pointer;
+}
+
+.table-container {
+width: 100%;
+height: 100%; /* or set a specific height */
+margin: 20px 0;
+overflow-x: auto;
+}
+
+.table-container table {
+width: 100%;
+border-collapse: collapse;
+background-color: #333;
+opacity: 0.9; /* Adding overall opacity to the table */
+}
+
+.table-container th, .table-container td {
+border: 1px solid #555;
+padding: 8px;
+text-align: left;
+color: white;
+background-color: rgba(0, 0, 0, 0.8); /* Background with opacity for each cell */
 }
