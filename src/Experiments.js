@@ -10,7 +10,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 function Experiments() {
   const [experimentSettings, setExperimentSettings] = useState({
     independentVar: 'D',
-    inputValues: '1 2 3',
+    inputValues: '',
     color1: '#ff0000',
     color2: '#00ff00',
     color3: '#0000ff',
@@ -88,7 +88,8 @@ function Experiments() {
   try {
     const experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
     setChartData(experimentResults);
-  } catch (err) {
+  }
+  catch (err) {
     setErrorMessage(`Error running experiments: ${err.message}`);
   }
   setIsComputing(false);
@@ -98,13 +99,13 @@ function Experiments() {
 
 
   const renderResultsTable = () => {
-  if (!chartData || isComputing) return null;
+    if (!chartData || isComputing) return null;
 
-  return (
-    <div className="table-container">
-      <table>
-        <thead>
-          <tr>
+    return (
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
             <th>Experiment</th>
             <th>A Min</th>
             <th>A Max</th>
@@ -124,7 +125,7 @@ function Experiments() {
             <th>C Min</th>
             <th>C Max</th>
             <th>C Avg</th>
-          </tr>
+            </tr>
         </thead>
         <tbody>
           {chartData.map((data, index) => (
