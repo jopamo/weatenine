@@ -88,6 +88,18 @@ p {
 .manual-text-background img {
   max-width: 100%;
   height: auto;
+  display: block;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+}
+
+.user-manual-button {
+  position: fixed;
+  bottom: 10px; /* Adjust this value for spacing from the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; /* Adjust as needed to bring the button to the top layer */
 }
 
 @media screen and (max-width: 768px) {

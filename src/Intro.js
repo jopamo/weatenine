@@ -23,11 +23,16 @@ function Intro({ setCurrentPage }) {
         <div className="intro-text">
           <h1>Welcome to Random Paint</h1>
           <p>Touch the screen to continue</p>
-          <button onClick={toggleManual}>User Manual</button>
         </div>
       )}
 
       {showManual && <UserManualPopup onClose={toggleManual} />}
+
+      {!showManual && (
+        <button onClick={toggleManual} className="user-manual-button">
+          User Manual
+        </button>
+      )}
     </div>
   );
 }
