@@ -70,32 +70,49 @@ function Experiments() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-  // Extract the necessary values from the state
   const { independentVar, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR, inputValues } = experimentSettings;
 
-  // Run checkInput function to parse and validate input values
-  const { values, error } = checkInput(inputValues, MAX_VALUES); // Assuming MAX_VALUES is defined
+  const { values, error } = checkInput(inputValues, MAX_VALUES);
+
   if (error) {
     setErrorMessage(error);
     return;
   }
 
   setErrorMessage('');
-
   setIsComputing(true);
+
   try {
     const experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
-    setChartData(experimentResults);
-  }
-  catch (err) {
+
+    let allExperimentResults = [];
+    if (independentVar === 'R') {
+      // For 'R', assign R values based on the pattern
+      let rCounter = 0;
+      values.forEach(rVal => {
+        for (let i = 0; i < rVal; i++) {
+          allExperimentResults.push({ ...experimentResults[rCounter], independentVarValue: rVal });
+          rCounter++;
+        }
+      });
+    } else {
+      // For 'D' and 'X', assign each value directly to the corresponding results
+      const resultsPerValue = experimentResults.length / values.length;
+      allExperimentResults = experimentResults.map((result, index) => {
+        const varValue = values[Math.floor(index / resultsPerValue)];
+        return { ...result, independentVarValue: varValue };
+      });
+    }
+
+    setChartData(allExperimentResults);
+  } catch (err) {
     setErrorMessage(`Error running experiments: ${err.message}`);
   }
+
   setIsComputing(false);
 };
-
-
 
 
   const renderResultsTable = () => {
@@ -106,7 +123,7 @@ function Experiments() {
         <table>
           <thead>
             <tr>
-            <th>Experiment</th>
+              <th>{experimentSettings.independentVar} Value</th>
             <th>A Min</th>
             <th>A Max</th>
             <th>A Avg</th>
@@ -130,7 +147,7 @@ function Experiments() {
         <tbody>
           {chartData.map((data, index) => (
             <tr key={index}>
-              <td>Experiment {index + 1}</td>
+              <td>{data.independentVarValue}</td>
               <td>{parseFloat(data.A.min).toFixed(1)}</td>
               <td>{parseFloat(data.A.max).toFixed(1)}</td>
               <td>{parseFloat(data.A.average).toFixed(1)}</td>
