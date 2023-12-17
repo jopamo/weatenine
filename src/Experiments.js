@@ -70,50 +70,53 @@ function Experiments() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const { independentVar, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR, inputValues } = experimentSettings;
+    const { independentVar, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR, inputValues } = experimentSettings;
+    const { values, error } = checkInput(inputValues, MAX_VALUES);
 
-  const { values, error } = checkInput(inputValues, MAX_VALUES);
-
-  if (error) {
-    setErrorMessage(error);
-    return;
-  }
-
-  setErrorMessage('');
-  setIsComputing(true);
-
-  try {
-    const experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
-
-    let allExperimentResults = [];
-    if (independentVar === 'R') {
-      // For 'R', assign R values based on the pattern
-      let rCounter = 0;
-      values.forEach(rVal => {
-        for (let i = 0; i < rVal; i++) {
-          allExperimentResults.push({ ...experimentResults[rCounter], independentVarValue: rVal });
-          rCounter++;
-        }
-      });
-    } else {
-      // For 'D' and 'X', assign each value directly to the corresponding results
-      const resultsPerValue = experimentResults.length / values.length;
-      allExperimentResults = experimentResults.map((result, index) => {
-        const varValue = values[Math.floor(index / resultsPerValue)];
-        return { ...result, independentVarValue: varValue };
-      });
+    if (error) {
+      setErrorMessage(error);
+      return;
     }
 
-    setChartData(allExperimentResults);
-  } catch (err) {
-    setErrorMessage(`Error running experiments: ${err.message}`);
-  }
+    setErrorMessage('');
+    setIsComputing(true);
 
-  setIsComputing(false);
-};
+    setTimeout(async () => {
+      try {
+        const experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
 
+        let allExperimentResults = [];
+
+        if (independentVar === 'R') {
+          let rCounter = 0;
+
+          values.forEach(rVal => {
+            for (let i = 0; i < rVal; i++) {
+              allExperimentResults.push({ ...experimentResults[rCounter], independentVarValue: rVal });
+              rCounter++;
+            }
+          });
+        }
+        else {
+          const resultsPerValue = experimentResults.length / values.length;
+          allExperimentResults = experimentResults.map((result, index) => {
+            const varValue = values[Math.floor(index / resultsPerValue)];
+            return { ...result, independentVarValue: varValue };
+          });
+        }
+
+        setChartData(allExperimentResults);
+      }
+      catch (err) {
+        setErrorMessage(`Error running experiments: ${err.message}`);
+      }
+      finally {
+        setIsComputing(false);
+      }
+    }, 0);
+  };
 
   const renderResultsTable = () => {
     if (!chartData || isComputing) return null;
@@ -178,13 +181,14 @@ function Experiments() {
 
 
   const renderComputationProgress = () => {
-    if (!isComputing) return null;
-
-    return (
-      <div>
-        <p>Computing results, please wait...</p>
-      </div>
-    );
+    if (isComputing) {
+      return (
+        <div className="loading-container">
+          <p>Computing results, this might take a minute. Please wait...</p>
+        </div>
+      );
+    }
+    return null;
   };
 
   const toggleFullscreen = () => {
@@ -192,10 +196,14 @@ function Experiments() {
   };
 
   return (
-  <div className="Experiments">
-    <Background />
-    <h1>Experiment Configuration</h1>
-    <form onSubmit={handleSubmit}>
+    <div className="Experiments">
+      <Background />
+      {isComputing ? (
+        renderComputationProgress()
+      ) : (
+        <>
+          <h1>Experiment Configuration</h1>
+          <form onSubmit={handleSubmit}>
       <div>
         <label>
           Independent Variable:
@@ -327,16 +335,16 @@ function Experiments() {
     </form>
 
     <h1>Experiment Results</h1>
-    {renderComputationProgress()}
-    {renderResultsTable()}
-    {showGraphs && chartData && chartData.datasets.map((dataset, index) => (
-      <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
-        <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
-      </div>
-    ))}
-  </div>
-);
-
+          {renderResultsTable()}
+          {showGraphs && chartData && chartData.datasets.map((dataset, index) => (
+            <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
+              <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
 }
 
 export default Experiments;
