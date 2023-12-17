@@ -118,6 +118,30 @@ function Experiments() {
     }, 0);
   };
 
+  function formatFixedValues() {
+    const { independentVar, fixedX, fixedY, fixedR } = experimentSettings;
+
+    let fixedValues = [];
+
+    if (independentVar === 'D') {
+      fixedValues.push(`R: ${fixedR}`);
+    }
+
+    if (independentVar === 'X') {
+      fixedValues.push(`Y: ${fixedY}`);
+      fixedValues.push(`R: ${fixedR}`);
+    }
+
+    if (independentVar === 'R') {
+      fixedValues.push(`X: ${fixedX}`);
+      fixedValues.push(`Y: ${fixedY}`);
+    }
+
+    return fixedValues.join(', ');
+  }
+
+
+
   const renderResultsTable = () => {
     if (!chartData || isComputing) return null;
 
@@ -126,7 +150,8 @@ function Experiments() {
         <table>
           <thead>
             <tr>
-              <th>{experimentSettings.independentVar} Value</th>
+            <th>{experimentSettings.independentVar} Value</th>
+            <th>Fixed Values</th>
             <th>A Min</th>
             <th>A Max</th>
             <th>A Avg</th>
@@ -151,6 +176,7 @@ function Experiments() {
           {chartData.map((data, index) => (
             <tr key={index}>
               <td>{data.independentVarValue}</td>
+              <td>{formatFixedValues()}</td>
               <td>{parseFloat(data.A.min).toFixed(1)}</td>
               <td>{parseFloat(data.A.max).toFixed(1)}</td>
               <td>{parseFloat(data.A.average).toFixed(1)}</td>
