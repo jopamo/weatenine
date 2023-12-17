@@ -19,11 +19,14 @@ function Experiments() {
     fixedY: 10,
     fixedR: 5
   });
+
+  const [selectedDependentVars, setSelectedDependentVars] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [chartData, setChartData] = useState(null);
   const [showGraphs, setShowGraphs] = useState(false);
   const [isComputing, setIsComputing] = useState(false);
+  const [experimentsCompleted, setExperimentsCompleted] = useState(false);
 
   const MAX_VALUES = 99;
 
@@ -114,6 +117,7 @@ function Experiments() {
       }
       finally {
         setIsComputing(false);
+        setExperimentsCompleted(true);
       }
     }, 0);
   };
@@ -140,6 +144,67 @@ function Experiments() {
     return fixedValues.join(', ');
   }
 
+  const handleDependentVarSelection = (varName) => {
+    setSelectedDependentVars((prevSelection) => {
+      if (prevSelection.includes(varName)) {
+        return prevSelection.filter(item => item !== varName);
+      }
+      if (prevSelection.length < 2) {
+        return [...prevSelection, varName];
+      }
+      return prevSelection;
+    });
+  };
+
+  const renderDependentVarSelection = () => {
+    if (!experimentsCompleted) return null;
+    const dependentVariables = ['A', 'A1', 'A2', 'A3', 'B', 'C'];
+    return (
+      <div>
+        <h2>Select Dependent Variables</h2>
+        {dependentVariables.map((varName) => (
+          <label key={varName}>
+            <input
+              type="checkbox"
+              checked={selectedDependentVars.includes(varName)}
+              onChange={() => handleDependentVarSelection(varName)}
+            />
+            {varName}
+          </label>
+        ))}
+      </div>
+    );
+  };
+
+  const renderReducedTable = () => {
+  if (selectedDependentVars.length === 0 || !chartData) return null;
+
+  return (
+    <div className="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{experimentSettings.independentVar} Value</th>
+            {selectedDependentVars.map((varName) => (
+              <th key={varName}>{varName}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {chartData.map((data, index) => (
+            <tr key={index}>
+              <td>{data.independentVarValue}</td>
+              {selectedDependentVars.map((varName) => {
+                const value = data[varName] ? parseFloat(data[varName].average).toFixed(1) : 'N/A';
+                return <td key={varName}>{value}</td>;
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 
   const renderResultsTable = () => {
@@ -360,17 +425,22 @@ function Experiments() {
       <button type="submit">Run Experiments</button>
     </form>
 
-    <h1>Experiment Results</h1>
-          {renderResultsTable()}
-          {showGraphs && chartData && chartData.datasets.map((dataset, index) => (
-            <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
-              <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
-            </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
+    {experimentsCompleted && (
+          <>
+            <h1>Experiment Results</h1>
+            {renderDependentVarSelection()}
+            {selectedDependentVars.length > 0 ? renderReducedTable() : renderResultsTable()}
+          </>
+        )}
+        {chartData && chartData.datasets && chartData.datasets.map((dataset, index) => (
+          <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
+            <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
+          </div>
+        ))}
+      </>
+    )}
+  </div>
+);
 }
 
 export default Experiments;
