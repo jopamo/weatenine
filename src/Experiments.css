@@ -39,7 +39,8 @@ label {
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
-input[type="number"], select {
+input[type="number"],
+select {
   padding: 5px;
   background-color: #333;
   color: #ddd;
@@ -75,7 +76,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.chart-small, .chart-fullscreen {
+.chart-small,
+.chart-fullscreen {
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   padding: 15px;
@@ -114,7 +116,8 @@ button:disabled {
   opacity: 0.9;
 }
 
-.table-container th, .table-container td {
+.table-container th,
+.table-container td {
   border: 1px solid #555;
   padding: 8px;
   text-align: left;
@@ -147,4 +150,20 @@ button:disabled {
 
 .chart-container .chartjs-chart {
   margin-bottom: 40px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

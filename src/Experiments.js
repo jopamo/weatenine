@@ -51,7 +51,7 @@ function Experiments({ setCurrentPage }) {
       title: {
         display: true,
         text: `Independent Variable: ${experimentSettings.independentVar}`,
-        color: 'black',
+        color: 'white',
       },
       scaleLabel: {
         display: true,
@@ -88,7 +88,7 @@ function Experiments({ setCurrentPage }) {
   layout: {
     padding: {
       top: 20,
-      bottom: 20,
+      bottom: 50,
       left: 20,
       right: 20,
     },
