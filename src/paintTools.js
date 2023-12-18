@@ -6,7 +6,6 @@ const isMixedColor = (color, originalColors) => {
   return mixed;
 };
 
-
 function hexToRgbArray(hex) {
   const r = parseInt(hex.substring(1, 3), 16);
   const g = parseInt(hex.substring(3, 5), 16);
@@ -18,11 +17,11 @@ function hexToRgbArray(hex) {
 }
 
 const rgbToHex = (r, g, b) => {
-  const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  const hex =
+    "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   //console.log(`rgbToHex: rgb = [${r}, ${g}, ${b}], hex = ${hex}`);
   return hex;
 };
-
 
 const mixColors = (colorA, colorB) => {
   if (!colorA) return colorB; // If no colorA, return colorB
@@ -42,55 +41,63 @@ const mixColors = (colorA, colorB) => {
   return mixedColor;
 };
 
-
 // Check whether a stopping criterion for painting is met
-export const checkStoppingCriteria = (grid, stoppingCriterion, color1, color2, color3) => {
+export const checkStoppingCriteria = (
+  grid,
+  stoppingCriterion,
+  color1,
+  color2,
+  color3,
+) => {
   switch (stoppingCriterion) {
     // Criterion: Stop when all squares on the grid are painted at least once
-    case 'lastUnpainted':
+    case "lastUnpainted":
       // Check if every cell in every row of the grid has been painted at least once
       // grid.every(...) checks each row, and row.every(...) checks each cell in the row
-      const lastUnpainted = grid.every(row => row.every(cell => cell.color !== null));
+      const lastUnpainted = grid.every((row) =>
+        row.every((cell) => cell.color !== null),
+      );
       // Return an object indicating if this criterion is met (true/false) and the
       // associated message
       return {
         met: lastUnpainted,
-        message: 'Stopped: All squares have been painted at least once.'
+        message: "Stopped: All squares have been painted at least once.",
       };
 
     // Criterion: Stop when any square is painted twice
-    case 'secondBlob':
+    case "secondBlob":
       // Check if there is at least one cell in any row of the grid that has been painted twice
       // grid.some(...) checks each row, and row.some(...) checks each cell in the row
-      const secondBlob = grid.some(row => row.some(cell => cell.count >= 2));
+      const secondBlob = grid.some((row) =>
+        row.some((cell) => cell.count >= 2),
+      );
       // Return an object indicating if this criterion is met and the associated message
       return {
         met: secondBlob,
-        message: 'Stopped: A square has been painted twice.'
+        message: "Stopped: A square has been painted twice.",
       };
 
     // Criterion: Stop when all squares have mixed colors
-    case 'allMixedColors':
+    case "allMixedColors":
       const originalColors = [color1, color2, color3];
-      const allPainted = grid.every(row =>
-        row.every(cell =>
-          cell.color !== null &&
-          isMixedColor(cell.color, originalColors)
-        )
+      const allPainted = grid.every((row) =>
+        row.every(
+          (cell) =>
+            cell.color !== null && isMixedColor(cell.color, originalColors),
+        ),
       );
 
       return {
         met: allPainted,
-        message: 'Stopped: The entire board is filled with mixed colors.'
+        message: "Stopped: The entire board is filled with mixed colors.",
       };
 
     // Default case: if the stoppingCriterion provided doesn't match any of the cases
     default:
       // Return an object indicating that no criterion has been met
-      return { met: false, message: '' };
+      return { met: false, message: "" };
   }
 };
-
 
 // Initializes 2d array, each cell is an object with color and count properties
 export const initializeGrid = (xDimension, yDimension) => {
@@ -110,13 +117,21 @@ export const initializeGrid = (xDimension, yDimension) => {
       // The object has two properties:
       // color: Initially set to null
       // count: Represents how many times the cell has been painted
-      ({ color: null, count: 0 }))
+      ({ color: null, count: 0 }),
+    ),
   );
 };
 
-
 // Paint a random cell in a grid with one of the provided colors
-export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, color3, counts) => {
+export const paintRandomCell = (
+  grid,
+  xDimension,
+  yDimension,
+  color1,
+  color2,
+  color3,
+  counts,
+) => {
   // Select a random x-coordinate within the grid. Math.random()
   // generates a number between 0 (inclusive) and 1 (exclusive)
   // Multiplying by xDimension scales this to the grid width, and
@@ -163,14 +178,15 @@ export const paintRandomCell = (grid, xDimension, yDimension, color1, color2, co
   return {
     grid,
     counts,
-    paintedCell: { x, y }
+    paintedCell: { x, y },
   };
 };
 
-
 // simulate painting the grid according to certain rules
 const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
-  console.log(`Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`);
+  console.log(
+    `Starting PAINT_ONCE with dimensions: X=${X}, Y=${Y}, Colors: ${C1}, ${C2}, ${C3}, Stopping Criterion: ${S}`,
+  );
 
   // Init a grid based on given dimensions X (width) and Y (height)
   let grid = initializeGrid(X, Y);
@@ -199,7 +215,7 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
     const {
       grid: updatedGrid,
       counts: newCounts,
-      paintedCell
+      paintedCell,
     } = paintRandomCell(grid, X, Y, C1, C2, C3, counts);
 
     // Update the grid and counts with the values returned from painting a cell
@@ -215,7 +231,8 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
     // If a stopping criterion is met, exit the loop
     if (stopMessage.met) {
       // Calculate the total number of color drops by adding the totals of each color
-      const totalDrops = counts.totalColor1 + counts.totalColor2 + counts.totalColor3;
+      const totalDrops =
+        counts.totalColor1 + counts.totalColor2 + counts.totalColor3;
       counts.totalDrops = totalDrops;
 
       // Calculate the average number of drops per square on the grid
@@ -232,7 +249,7 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
 
       return {
         counts,
-        stopMessage
+        stopMessage,
       };
     }
   }
@@ -250,7 +267,9 @@ export function checkInput(str, maxValues) {
     }
 
     if (stringValues.length > maxValues) {
-      throw new Error(`Too many values. Only a maximum of ${maxValues} different values are allowed.`);
+      throw new Error(
+        `Too many values. Only a maximum of ${maxValues} different values are allowed.`,
+      );
     }
 
     for (let i = 0; i < stringValues.length; i++) {
@@ -258,36 +277,46 @@ export function checkInput(str, maxValues) {
       const intValue = parseInt(stringValue, 10);
 
       if (isNaN(intValue) || intValue.toString() !== stringValue) {
-        throw new Error(`Invalid number: '${stringValue}' is not a valid integer at position ${i + 1}.`);
+        throw new Error(
+          `Invalid number: '${stringValue}' is not a valid integer at position ${
+            i + 1
+          }.`,
+        );
       }
       if (intValue > MAX_INT_VALUE) {
-        throw new Error(`Value exceeds maximum limit: '${intValue}' at position ${i + 1} must be less than or equal to ${MAX_INT_VALUE}.`);
+        throw new Error(
+          `Value exceeds maximum limit: '${intValue}' at position ${
+            i + 1
+          } must be less than or equal to ${MAX_INT_VALUE}.`,
+        );
       }
       if (intValue < previousValue) {
-        throw new Error(`Invalid sequence: ${intValue} is not greater than ${previousValue} at position ${i + 1}.`);
+        throw new Error(
+          `Invalid sequence: ${intValue} is not greater than ${previousValue} at position ${
+            i + 1
+          }.`,
+        );
       }
       previousValue = intValue;
       values.push(intValue);
     }
-  }
-  catch (error) {
+  } catch (error) {
     return { error: error.message, values: null };
   }
 
   return { values: values, error: null };
 }
 
-
 function PAINT_MANY(X, Y, C1, C2, C3, S, R) {
   // Log the settings used
-  console.log('PAINT_MANY executed with these Settings:');
-  console.log('X:', X);
-  console.log('Y:', Y);
-  console.log('C1:', C1);
-  console.log('C2:', C2);
-  console.log('C3:', C3);
-  console.log('S:', S);
-  console.log('R:', R);
+  console.log("PAINT_MANY executed with these Settings:");
+  console.log("X:", X);
+  console.log("Y:", Y);
+  console.log("C1:", C1);
+  console.log("C2:", C2);
+  console.log("C3:", C3);
+  console.log("S:", S);
+  console.log("R:", R);
 
   let stats = {
     A: { min: Infinity, max: 0, total: 0 },
@@ -295,20 +324,27 @@ function PAINT_MANY(X, Y, C1, C2, C3, S, R) {
     A2: { min: Infinity, max: 0, total: 0 },
     A3: { min: Infinity, max: 0, total: 0 },
     B: { min: Infinity, max: 0, total: 0 },
-    C: { min: Infinity, max: 0, total: 0 }
+    C: { min: Infinity, max: 0, total: 0 },
   };
 
   for (let i = 0; i < R; i++) {
     const result = PAINT_ONCE(X, Y, C1, C2, C3, S);
-    const { totalDrops, totalColor1, totalColor2, totalColor3, squareMostDrops, averageTotal } = result.counts;
+    const {
+      totalDrops,
+      totalColor1,
+      totalColor2,
+      totalColor3,
+      squareMostDrops,
+      averageTotal,
+    } = result.counts;
 
     // Update stats for A, A1, A2, A3, B, C
-    updateStats(stats, 'A', totalDrops);
-    updateStats(stats, 'A1', totalColor1);
-    updateStats(stats, 'A2', totalColor2);
-    updateStats(stats, 'A3', totalColor3);
-    updateStats(stats, 'B', squareMostDrops);
-    updateStats(stats, 'C', averageTotal);
+    updateStats(stats, "A", totalDrops);
+    updateStats(stats, "A1", totalColor1);
+    updateStats(stats, "A2", totalColor2);
+    updateStats(stats, "A3", totalColor3);
+    updateStats(stats, "B", squareMostDrops);
+    updateStats(stats, "C", averageTotal);
   }
 
   // Compute averages
@@ -332,30 +368,40 @@ function computeAverages(stats, R) {
   }
 }
 
-export function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX, fixedY, fixedR) {
-  console.log('runExperiments executed with these Settings:');
-  console.log('C1:', C1);
-  console.log('C2:', C2);
-  console.log('C3:', C3);
-  console.log('S:', S);
-  console.log('values:', values);
+export function runExperiments(
+  independentVarType,
+  values,
+  C1,
+  C2,
+  C3,
+  S,
+  fixedX,
+  fixedY,
+  fixedR,
+) {
+  console.log("runExperiments executed with these Settings:");
+  console.log("C1:", C1);
+  console.log("C2:", C2);
+  console.log("C3:", C3);
+  console.log("S:", S);
+  console.log("values:", values);
 
   // Results container
   const results = [];
 
   // Iterate over each value of the independent variable
-  values.forEach(value => {
+  values.forEach((value) => {
     let X, Y, R;
 
     // Determine X, Y, and R based on the independent variable type
-    if (independentVarType === 'D') {
+    if (independentVarType === "D") {
       X = Y = value;
       R = fixedR;
-    } else if (independentVarType === 'X') {
+    } else if (independentVarType === "X") {
       X = value;
       Y = fixedY;
       R = fixedR;
-    } else if (independentVarType === 'R') {
+    } else if (independentVarType === "R") {
       X = fixedX;
       Y = fixedY;
       R = value;
@@ -368,13 +414,13 @@ export function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX
     }
   });
 
-  console.log('Experiment Results:', results);
+  console.log("Experiment Results:", results);
   return results;
 }
 
 export function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
+  const letters = "0123456789ABCDEF";
+  let color = "#";
   for (let i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }

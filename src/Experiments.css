@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -9,7 +10,7 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   padding: 20px;
   text-align: center;
   background-color: transparent;
@@ -36,7 +37,11 @@ label {
   display: inline-block;
   margin-right: 10px;
   color: white;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 input[type="number"],
@@ -61,7 +66,7 @@ button {
   font-size: 16px;
   cursor: pointer;
   border: none;
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   border-radius: 4px;
   transition: background-color 0.3s;
@@ -88,18 +93,12 @@ button:disabled {
   color: white;
 }
 
-.table-container {
-  width: 100%;
-  height: 100%;
-  margin: 20px 0;
-  overflow-x: auto;
-}
-
 .table-container table {
   width: 100%;
   border-collapse: collapse;
   background-color: #333;
   opacity: 0.9;
+  table-layout: fixed;
 }
 
 .table-container th,
@@ -109,6 +108,24 @@ button:disabled {
   text-align: left;
   color: white;
   background-color: rgba(0, 0, 0, 0.8);
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .table-container th,
+  .table-container td {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-container th,
+  .table-container td {
+    font-size: 8px;
+  }
 }
 
 .loading-container {
@@ -152,4 +169,14 @@ button:disabled {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container button {
+  margin: 0;
+  padding: 10;
 }
