@@ -385,11 +385,11 @@ const renderGraph = () => {
     };
 
     return (
-      <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', padding: '20px', marginBottom: '20px', height: '500px' }}>
-        <h2 style={{ textAlign: 'center', color: 'white' }}>{labelMapping[varName] || varName}</h2>
-        <Line data={graphData} options={chartOptions} />
-      </div>
-    );
+  <div className="graph-container">
+    <h2 className="graph-title">{labelMapping[varName] || varName}</h2>
+    <Line data={graphData} options={chartOptions} />
+  </div>
+);
   });
 };
 

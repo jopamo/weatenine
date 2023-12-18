@@ -76,30 +76,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.chart-small,
-.chart-fullscreen {
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  padding: 15px;
-  border-radius: 8px;
+.graph-container {
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 50px;
+  margin-bottom: 0px;
+  height: 500px;
 }
 
-.chart-small {
-  width: 300px;
-  height: 300px;
-  margin: auto;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out;
-}
-
-.chart-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  cursor: pointer;
+.graph-title {
+  text-align: center;
+  color: white;
 }
 
 .table-container {
@@ -149,7 +135,7 @@ button:disabled {
 }
 
 .chart-container .chartjs-chart {
-  margin-bottom: 40px;
+  margin-bottom: 50px;
 }
 
 ::-webkit-scrollbar {
