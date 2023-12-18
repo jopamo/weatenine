@@ -129,24 +129,6 @@ button:disabled {
   padding: 8px;
 }
 
-
-.table-reduced {
-  width: 100%;
-  font-size: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.table-reduced table {
-  width: 100%; /* Ensures the table width adapts to the container */
-  border-collapse: collapse;
-}
-
-.table-reduced th,
-.table-reduced td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
 .loading-container {
   display: flex;
   justify-content: center;
@@ -193,6 +175,7 @@ button:disabled {
 .button-container {
   display: flex;
   flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .button-container button {

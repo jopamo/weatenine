@@ -253,34 +253,50 @@ function Experiments({ setCurrentPage }) {
   const renderReducedTable = () => {
     if (selectedDependentVars.length === 0 || !chartData) return null;
 
+    // Common function to format values
+    const formatValue = (value) => {
+        if (value === null || value === undefined) return "N/A";
+        return Math.floor(value) === value ? value.toFixed(0) : parseFloat(value).toFixed(1);
+    };
+
     return (
-      <div className="table-reduced">
-        <table>
-          <thead>
-            <tr>
-              <th>{experimentSettings.independentVar} Value</th>
-              {selectedDependentVars.map((varName) => (
-                <th key={varName}>{varName}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {chartData.map((data, index) => (
-              <tr key={index}>
-                <td>{data.independentVarValue}</td>
-                {selectedDependentVars.map((varName) => {
-                  const value = data[varName]
-                    ? parseFloat(data[varName].average).toFixed(1)
-                    : "N/A";
-                  return <td key={varName}>{value}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <div className="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{experimentSettings.independentVar} Value</th>
+                        <th>Fixed</th>
+                        {selectedDependentVars.map((varName) => (
+                            <React.Fragment key={varName}>
+                                <th>{`${varName} Min`}</th>
+                                <th>{`${varName} Max`}</th>
+                                <th>{`${varName} Avg`}</th>
+                            </React.Fragment>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {chartData.map((data, index) => (
+                        <tr key={index}>
+                            <td>{data.independentVarValue}</td>
+                            <td>{formatFixedValues()}</td>
+                            {selectedDependentVars.map((varName) => (
+                                <React.Fragment key={varName}>
+                                    <td>{formatValue(data[varName]?.min)}</td>
+                                    <td>{formatValue(data[varName]?.max)}</td>
+                                    <td>{formatValue(data[varName]?.average)}</td>
+                                </React.Fragment>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
-  };
+};
+
+
+
 
   const renderResultsTable = () => {
     if (!chartData || isComputing) return null;
@@ -299,7 +315,7 @@ function Experiments({ setCurrentPage }) {
           <thead>
             <tr>
               <th>{experimentSettings.independentVar} Value</th>
-              <th>Fixed Values</th>
+              <th>Fixed</th>
               <th>A Min</th>
               <th>A Max</th>
               <th>A Avg</th>
@@ -486,7 +502,7 @@ function Experiments({ setCurrentPage }) {
                   <label>
                     Values:
                     <input
-                      type="text"
+                      type="tel"
                       name="inputValues"
                       value={experimentSettings.inputValues}
                       onChange={handleInputChange}
