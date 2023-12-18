@@ -338,6 +338,7 @@ export function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX
   console.log('C2:', C2);
   console.log('C3:', C3);
   console.log('S:', S);
+  console.log('values:', values);
 
   // Results container
   const results = [];
@@ -369,4 +370,13 @@ export function runExperiments(independentVarType, values, C1, C2, C3, S, fixedX
 
   console.log('Experiment Results:', results);
   return results;
+}
+
+export function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }

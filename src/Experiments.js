@@ -7,7 +7,17 @@ import './Experiments.css';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-function Experiments() {
+function Experiments({ setCurrentPage }) {
+  const labelMapping = {
+    A: 'Total Number of Paint Drops',
+    A1: 'Number of Paint Drops (Color 1)',
+    A2: 'Number of Paint Drops (Color 2)',
+    A3: 'Number of Paint Drops (Color 3)',
+    B: 'Maximum Paint Drops on a Square',
+    C: 'Average Paint Drops on All Squares',
+  };
+
+
   const [experimentSettings, setExperimentSettings] = useState({
     independentVar: 'D',
     inputValues: '',
@@ -22,47 +32,79 @@ function Experiments() {
 
   const [selectedDependentVars, setSelectedDependentVars] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [chartData, setChartData] = useState(null);
-  const [showGraphs, setShowGraphs] = useState(false);
+  const [showTable, setShowTable] = useState(true);
+  const [showGraph, setShowGraph] = useState(false);
   const [isComputing, setIsComputing] = useState(false);
   const [experimentsCompleted, setExperimentsCompleted] = useState(false);
+  const [showExperimentConfig, setShowExperimentConfig] = useState(true);
 
   const MAX_VALUES = 99;
 
-  const chartOptions = {
-    plugins: {
-      legend: {
-        labels: {
-          font: {
-            size: 14
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          color: 'rgba(255,255,255,0.8)'
-        }
+ const chartOptions = {
+
+  scales: {
+    x: {
+      grid: {
+        color: 'rgba(255,255,255,0.8)',
       },
-      y: {
-        grid: {
-          color: 'rgba(255,255,255,0.8)'
-        }
-      }
-    },
-    elements: {
-      line: {
-        borderWidth: 3
+      title: {
+        display: true,
+        text: `Independent Variable: ${experimentSettings.independentVar}`,
+        color: 'black',
       },
-      point: {
-        radius: 5
-      }
+      scaleLabel: {
+        display: true,
+        labelString: 'Square Canvas Dimension',
+        font: {
+          size: 14,
+          color: 'white',
+        },
+      },
     },
-    maintainAspectRatio: false,
-    responsive: true
-  };
+    y: {
+      grid: {
+        color: 'rgba(255,255,255,0.9)',
+      },
+      title: {
+        display: true,
+        text: 'Number of Paint Drops',
+        color: 'white',
+      },
+    },
+  },
+  elements: {
+    line: {
+      borderWidth: 3,
+    },
+    point: {
+      radius: 5,
+      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+      borderColor: 'rgba(255, 255, 255, 1)',
+    },
+  },
+  maintainAspectRatio: false,
+  responsive: true,
+  layout: {
+    padding: {
+      top: 20,
+      bottom: 20,
+      left: 20,
+      right: 20,
+    },
+  },
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  plugins: {
+    title: {
+      display: true,
+      text: '',
+      color: 'white',
+    },
+  },
+};
+
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,7 +130,7 @@ function Experiments() {
 
     setTimeout(async () => {
       try {
-        const experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
+        let experimentResults = await runExperiments(independentVar, values, color1, color2, color3, stoppingCriterion, fixedX, fixedY, fixedR);
 
         let allExperimentResults = [];
 
@@ -118,6 +160,7 @@ function Experiments() {
       finally {
         setIsComputing(false);
         setExperimentsCompleted(true);
+        setShowExperimentConfig(false);
       }
     }, 0);
   };
@@ -269,6 +312,101 @@ function Experiments() {
 };
 
 
+const handleContinue = () => {
+  setShowTable(false);
+  setShowGraph(true);
+
+};
+
+const handleNewTableGraph = () => {
+  setShowTable(true);
+  setShowGraph(false);
+};
+
+const handleNewExperiment = () => {
+  setExperimentSettings({
+    independentVar: 'D',
+    inputValues: '',
+    color1: '#ff0000',
+    color2: '#00ff00',
+    color3: '#0000ff',
+    stoppingCriterion: 'allMixedColors',
+    fixedX: 10,
+    fixedY: 10,
+    fixedR: 5
+  });
+
+  setSelectedDependentVars([]);
+  setShowTable(true);
+  setShowGraph(false);
+  setChartData(null);
+  setExperimentsCompleted(false);
+  setShowExperimentConfig(true);
+};
+
+
+const handleQuit = () => {
+  setCurrentPage('intro');
+};
+
+const renderGraph = () => {
+  if (!showGraph || !chartData) return null;
+
+  const variablesToDisplay = selectedDependentVars.length > 0 ? selectedDependentVars : ['A', 'A1', 'A2', 'A3', 'B', 'C'];
+
+  const colors = {
+    min: '#FF6384',
+    max: '#36A2EB',
+    average: '#FFCE56',
+  };
+
+  const createDatasets = (varName) => {
+    return ['min', 'max', 'average'].map(metric => {
+      return {
+        label: `${metric.toUpperCase()}`,
+        data: chartData.map(item => parseFloat(item[varName][metric])),
+        borderColor: colors[metric],
+        backgroundColor: colors[metric],
+        borderWidth: 2,
+        fill: false,
+        pointBackgroundColor: colors[metric],
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: colors[metric],
+      };
+    });
+  };
+
+  return variablesToDisplay.map(varName => {
+    const datasets = createDatasets(varName);
+    const graphData = {
+      labels: chartData.map(data => data.independentVarValue),
+      datasets: datasets,
+    };
+
+    return (
+      <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', padding: '20px', marginBottom: '20px', height: '500px' }}>
+        <h2 style={{ textAlign: 'center', color: 'white' }}>{labelMapping[varName] || varName}</h2>
+        <Line data={graphData} options={chartOptions} />
+      </div>
+    );
+  });
+};
+
+
+
+
+
+const renderUserOptions = () => {
+  if (!showGraph) return null;
+  return (
+    <div>
+      <button onClick={handleNewTableGraph}>Make a new table/graph</button>
+      <button onClick={handleNewExperiment}>New experiment</button>
+      <button onClick={handleQuit}>Quit</button>
+    </div>
+  );
+};
 
 
   const renderComputationProgress = () => {
@@ -282,44 +420,42 @@ function Experiments() {
     return null;
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
   return (
-    <div className="Experiments">
-      <Background />
-      {isComputing ? (
-        renderComputationProgress()
-      ) : (
-        <>
-          <h1>Experiment Configuration</h1>
-          <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Independent Variable:
-          <select
-            name="independentVar"
-            value={experimentSettings.independentVar}
-            onChange={handleInputChange}
-          >
-            <option value="D">D (Square Canvas Dimension)</option>
-            <option value="X">X (X-Dimension with constant Y)</option>
-            <option value="R">R (Number of Repetitions)</option>
-          </select>
-        </label>
-      </div>
-      <div>
-        <label>
-          Values:
-          <input
-            type="text"
-            name="inputValues"
-            value={experimentSettings.inputValues}
-            onChange={handleInputChange}
-          />
-        </label>
-      </div>
+  <div className="Experiments">
+    <Background />
+    {isComputing ? (
+      renderComputationProgress()
+    ) : (
+      <>
+        {showExperimentConfig && (
+          <>
+            <h1>Experiment Configuration</h1>
+            <form onSubmit={handleSubmit}>
+          <div>
+            <label>
+              Independent Variable:
+              <select
+                name="independentVar"
+                value={experimentSettings.independentVar}
+                onChange={handleInputChange}
+              >
+                <option value="D">D (Square Canvas Dimension)</option>
+                <option value="X">X (X-Dimension with constant Y)</option>
+                <option value="R">R (Number of Repetitions)</option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <label>
+              Values:
+              <input
+                type="text"
+                name="inputValues"
+                value={experimentSettings.inputValues}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
       {experimentSettings.independentVar === 'D' && (
         <div>
           <label>
@@ -423,20 +559,25 @@ function Experiments() {
       </div>
       {errorMessage && <p className="error">{errorMessage}</p>}
       <button type="submit">Run Experiments</button>
-    </form>
-
-    {experimentsCompleted && (
-          <>
-            <h1>Experiment Results</h1>
-            {renderDependentVarSelection()}
-            {selectedDependentVars.length > 0 ? renderReducedTable() : renderResultsTable()}
+            </form>
           </>
         )}
-        {chartData && chartData.datasets && chartData.datasets.map((dataset, index) => (
-          <div key={index} className={isFullscreen ? "chart-fullscreen" : "chart-small"} onClick={toggleFullscreen}>
-            <Line data={{ labels: chartData.labels, datasets: [dataset] }} options={chartOptions} />
-          </div>
-        ))}
+
+         {experimentsCompleted && showTable && (
+      <>
+        <h1>Experiment Results</h1>
+        {renderDependentVarSelection()}
+        {selectedDependentVars.length > 0 ? renderReducedTable() : renderResultsTable()}
+        <button onClick={handleContinue}>Continue</button>
+      </>
+    )}
+
+    {showGraph && (
+      <>
+        {renderGraph()}
+        {renderUserOptions()}
+      </>
+        )}
       </>
     )}
   </div>

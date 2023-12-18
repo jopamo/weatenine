@@ -18,9 +18,6 @@ function App({ setCurrentPage }) {
     const xDimension = Math.floor(width / cellSize);
     const yDimension = Math.floor(window.innerHeight / cellSize);
 
-    //const xDimension = 2;
-    //const yDimension = 2;
-
     return { xDimension, yDimension };
   };
 
