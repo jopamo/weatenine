@@ -153,14 +153,6 @@ button:disabled {
   height: 15px;
 }
 
-.outlined-text {
-  color: white;
-  text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
-}
 @media (min-width: 768px) {
   .form-row {
     display: flex;

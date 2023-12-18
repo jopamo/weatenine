@@ -154,6 +154,7 @@ function App({ setCurrentPage }) {
   }, [
     grid,
     dimensions,
+    drawCell,
     color1,
     color2,
     color3,
@@ -204,22 +205,21 @@ function App({ setCurrentPage }) {
   };
 
   return (
-  <div className="App">
-    <Background />
-    <div className="config-container">
-    <h1>Random Paint</h1>
+    <div className="App">
+      <Background />
+      <div className="button-container">
+        <button
+          onClick={startPainting}
+          disabled={dimensions.xDimension === 0 || dimensions.yDimension === 0}
+        >
+          Start Painting
+        </button>
+        <br />
+        <button onClick={handleContinue}>Continue</button>
+      </div>
+      <div className="config-container">
+        <h1>Random Paint</h1>
         <form onSubmit={handleSubmit} className="settings-form">
-          <div className="buttons-container">
-            <button
-              onClick={startPainting}
-              disabled={
-                dimensions.xDimension === 0 || dimensions.yDimension === 0
-              }
-            >
-              Start Painting
-            </button>
-            <button onClick={handleContinue}>Continue</button>
-          </div>
           <div className="form-row">
             <div className="form-group">
               <label>X:</label>
