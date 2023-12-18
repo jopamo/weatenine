@@ -207,16 +207,6 @@ function App({ setCurrentPage }) {
   return (
     <div className="App">
       <Background />
-      <div className="button-container">
-        <button
-          onClick={startPainting}
-          disabled={dimensions.xDimension === 0 || dimensions.yDimension === 0}
-        >
-          Start Painting
-        </button>
-        <br />
-        <button onClick={handleContinue}>Continue</button>
-      </div>
       <div className="config-container">
         <h1>Random Paint</h1>
         <form onSubmit={handleSubmit} className="settings-form">
@@ -314,6 +304,19 @@ function App({ setCurrentPage }) {
             </div>
           </div>
         </form>
+      </div>
+
+      <div className="button-container">
+        <button
+          onClick={startPainting}
+          disabled={dimensions.xDimension === 0 || dimensions.yDimension === 0}
+        >
+          Start Painting
+        </button>
+        <br />
+        <button onClick={handleContinue}>Continue</button>
+          <div class="background"></div>
+
       </div>
 
       <div className="stopping-criteria-message">

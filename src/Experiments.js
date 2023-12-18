@@ -94,7 +94,7 @@ function Experiments({ setCurrentPage }) {
       },
       point: {
         radius: 5,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
         borderColor: "rgba(255, 255, 255, 1)",
       },
     },
@@ -457,6 +457,7 @@ function Experiments({ setCurrentPage }) {
         <button onClick={handleNewExperiment}>New experiment</button>
         <br />
         <button onClick={handleQuit}>Quit</button>
+        <div class="background"></div>
       </div>
     );
   };
@@ -473,13 +474,14 @@ function Experiments({ setCurrentPage }) {
   };
 
   return (
-    <div className="Experiments">
-      <Background />
-      {isComputing ? (
-        renderComputationProgress()
-      ) : (
-        <>
-          {showExperimentConfig && (
+  <div className="Experiments">
+    <Background />
+    {isComputing ? (
+      renderComputationProgress()
+    ) : (
+      <>
+        {showExperimentConfig && (
+          <>
             <div className="config-container">
               <h1>Experiment Configuration</h1>
               <form onSubmit={handleSubmit}>
@@ -619,37 +621,44 @@ function Experiments({ setCurrentPage }) {
                   </label>
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
-                <button type="submit">Run Experiments</button>
               </form>
             </div>
-          )}
 
-          {experimentsCompleted && showTable && (
             <div className="button-container">
-              <button onClick={handleContinue}>Continue</button>
+              <button onClick={handleSubmit}>Run Experiments</button>
+              <div className="background"></div>
             </div>
-          )}
+          </>
+        )}
 
-          {experimentsCompleted && showTable && (
-            <div className="config-container">
-              <h1>Experiment Results</h1>
-              {renderDependentVarSelection()}
-              {selectedDependentVars.length > 0
-                ? renderReducedTable()
-                : renderResultsTable()}
-            </div>
-          )}
+        {experimentsCompleted && showTable && (
+          <div className="config-container">
+            <h1>Experiment Results</h1>
+            {renderDependentVarSelection()}
+            {selectedDependentVars.length > 0
+              ? renderReducedTable()
+              : renderResultsTable()}
+          </div>
+        )}
 
-          {showGraph && (
-            <>
-              {renderUserOptions()}
-              {renderGraph()}
-            </>
-          )}
-        </>
-      )}
-    </div>
-  );
+        {showGraph && (
+          <>
+            {renderGraph()}
+            {renderUserOptions()}
+          </>
+        )}
+
+        {experimentsCompleted && showTable && (
+          <div className="button-container">
+            <button onClick={handleContinue}>Continue</button>
+            <div className="background"></div>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+);
+
 }
 
 export default Experiments;

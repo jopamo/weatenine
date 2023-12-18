@@ -1,3 +1,4 @@
+/* Base styles for html and body, with full height and no margins or padding */
 html,
 body {
   height: 100%;
@@ -6,6 +7,7 @@ body {
   background-color: transparent;
 }
 
+/* Main container layout using flexbox */
 .Experiments {
   display: flex;
   flex-direction: column;
@@ -17,6 +19,7 @@ body {
   color: #fff;
 }
 
+/* Layout for forms, centered alignment */
 .settings-form {
   display: flex;
   flex-direction: column;
@@ -24,6 +27,7 @@ body {
   width: 100%;
 }
 
+/* Grouping elements in a row, centered */
 .form-group {
   display: flex;
   flex-direction: row;
@@ -33,17 +37,15 @@ body {
   width: 100%;
 }
 
+/* Labels with text shadow effect */
 label {
   display: inline-block;
   margin-right: 10px;
   color: white;
-  text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
+/* Styles for number inputs and select elements */
 input[type="number"],
 select {
   padding: 5px;
@@ -53,34 +55,56 @@ select {
   border-radius: 4px;
 }
 
-.buttons-container {
-  display: flex;
+/* Container for buttons, with center alignment */
+.button-container {
+  position: relative;
+  display: inline-block;
   justify-content: center;
   gap: 10px;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  border: 10px;
+  border-radius: 4px;
 }
 
+/* Button styling */
 button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  border: none;
+  border: 10px;
   background-color: #007bff;
   color: white;
   border-radius: 4px;
   transition: background-color 0.3s;
 }
 
+/* Background styling for certain sections */
+.background {
+  position: absolute;
+  width: 100%;
+  height: 45px;
+  background-color: black;
+  bottom: -5px;
+  left: 0;
+  border-radius: 4px;
+  border: 2px solid #333;
+  z-index: 0;
+}
+
+/* Hover effect for buttons */
 button:hover {
   background-color: #0056b3;
 }
 
+/* Disabled button styling */
 button:disabled {
   background-color: #555;
   cursor: not-allowed;
 }
 
+/* Container for graph elements */
 .graph-container {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 50px;
@@ -88,47 +112,53 @@ button:disabled {
   height: 500px;
 }
 
+/* Styling for graph titles */
 .graph-title {
   text-align: center;
   color: white;
 }
 
+/* Responsive table container */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+  -webkit-overflow-scrolling: touch;
   background-color: rgba(0, 0, 0, 0.7);
 }
 
+/* Custom scrollbar styles for table */
 .table-responsive::-webkit-scrollbar {
-  height: 6px; /* Makes the scrollbar thinner */
+  height: 6px;
 }
 
 .table-responsive::-webkit-scrollbar-track {
-  background-color: #f1f1f1; /* Light track background */
+  background-color: #f1f1f1;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-  background-color: #888; /* Darker thumb color */
-  border-radius: 3px; /* Rounded corners for the thumb */
+  background-color: #888;
+  border-radius: 3px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Slightly darker color on hover */
+  background-color: #555;
 }
 
+/* Table styling within the responsive container */
 .table-responsive table {
   width: 100%;
-  min-width: 600px; /* Adjust as needed */
+  min-width: 600px;
   border-collapse: collapse;
 }
 
+/* Styling for table cells and headers */
 .table-responsive th,
 .table-responsive td {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
+/* Full-screen container for loading overlays */
 .loading-container {
   display: flex;
   justify-content: center;
@@ -144,18 +174,22 @@ button:disabled {
   z-index: 100;
 }
 
+/* Relative positioning for chart elements */
 .chart-container {
   position: relative;
 }
 
+/* Background styling for canvas within chart container */
 .chart-container canvas {
   background-color: rgba(0, 0, 0, 0.9);
 }
 
+/* Margin styling for chart elements */
 .chart-container .chartjs-chart {
   margin-bottom: 50px;
 }
 
+/* Custom scrollbar styles for the entire window */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -172,45 +206,45 @@ button:disabled {
   background: #555;
 }
 
+/* Flexbox layout for button container */
 .button-container {
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.9);
 }
 
+/* Margin and padding for buttons in the container */
 .button-container button {
   margin: 0;
   padding: 10;
 }
 
+/* Background and padding for configuration sections */
 .config-container {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   padding: 20px;
   border-radius: 10px;
 }
 
-/* Screen width 800px or less */
+/* Responsive font sizes for tables on smaller screens */
 @media screen and (max-width: 800px) {
   .table-responsive {
     font-size: 90%;
   }
 }
 
-/* Screen width 600px or less */
 @media screen and (max-width: 600px) {
   .table-responsive {
     font-size: 80%;
   }
 }
 
-/* Screen width 400px or less */
 @media screen and (max-width: 400px) {
   .table-responsive {
     font-size: 70%;
   }
 }
 
-/* Avoid going below 50% for readability */
 @media screen and (max-width: 300px) {
   .table-responsive {
     font-size: 60%;
