@@ -180,3 +180,9 @@ button:disabled {
   margin: 0;
   padding: 10;
 }
+
+.config-container {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+}

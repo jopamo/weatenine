@@ -466,7 +466,7 @@ function Experiments({ setCurrentPage }) {
       ) : (
         <>
           {showExperimentConfig && (
-            <>
+            <div className="config-container">
               <h1>Experiment Configuration</h1>
               <form onSubmit={handleSubmit}>
                 <div>
@@ -607,7 +607,7 @@ function Experiments({ setCurrentPage }) {
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <button type="submit">Run Experiments</button>
               </form>
-            </>
+            </div>
           )}
 
           {experimentsCompleted && showTable && (
