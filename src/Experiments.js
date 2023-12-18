@@ -236,7 +236,6 @@ function Experiments({ setCurrentPage }) {
     const dependentVariables = ["A", "A1", "A2", "A3", "B", "C"];
     return (
       <div>
-        <h2>Select Dependent Variables</h2>
         {dependentVariables.map((varName) => (
           <label key={varName}>
             <input
@@ -255,7 +254,7 @@ function Experiments({ setCurrentPage }) {
     if (selectedDependentVars.length === 0 || !chartData) return null;
 
     return (
-      <div className="table-container">
+      <div className="table-reduced">
         <table>
           <thead>
             <tr>
@@ -295,7 +294,7 @@ function Experiments({ setCurrentPage }) {
     };
 
     return (
-      <div className="table-container">
+      <div className="table-responsive">
         <table>
           <thead>
             <tr>
@@ -612,12 +611,14 @@ function Experiments({ setCurrentPage }) {
 
           {experimentsCompleted && showTable && (
             <>
+              <div className="config-container">
               <h1>Experiment Results</h1>
               {renderDependentVarSelection()}
               {selectedDependentVars.length > 0
                 ? renderReducedTable()
                 : renderResultsTable()}
               <button onClick={handleContinue}>Continue</button>
+              </div>
             </>
           )}
 

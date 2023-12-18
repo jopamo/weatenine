@@ -206,8 +206,8 @@ function App({ setCurrentPage }) {
   return (
   <div className="App">
     <Background />
-    <h1>Random Paint</h1>
     <div className="config-container">
+    <h1>Random Paint</h1>
         <form onSubmit={handleSubmit} className="settings-form">
           <div className="buttons-container">
             <button
