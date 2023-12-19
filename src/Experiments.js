@@ -457,6 +457,7 @@ function Experiments({ setCurrentPage }) {
                         name="inputValues"
                         value={experimentSettings.inputValues}
                         onChange={handleInputChange}
+                        placeholder="Ascending (1 2 3 ..)"
                       />
                     </label>
                   </div>
@@ -600,7 +601,7 @@ function Experiments({ setCurrentPage }) {
 
           {experimentsCompleted && showTable && (
             <div className="button-container">
-              <button onClick={handleContinue}>Continue</button>
+              <button onClick={handleContinue}>Continue (Generate Graphs)</button>
               <div className="background"></div>
             </div>
           )}
