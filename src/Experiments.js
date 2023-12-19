@@ -13,7 +13,9 @@ import {
 import { runExperiments, checkInput } from "./paintTools";
 import Background from "./Background";
 import "./Experiments.css";
+import getChartOptions from './chartConfig';
 
+// Registering necessary components for ChartJS
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,6 +27,7 @@ ChartJS.register(
 );
 
 function Experiments({ setCurrentPage }) {
+  // Mapping labels to various experiment variables
   const labelMapping = {
     A: "Total Number of Paint Drops",
     A1: "Number of Paint Drops (Color 1)",
@@ -34,6 +37,7 @@ function Experiments({ setCurrentPage }) {
     C: "Average Paint Drops on All Squares",
   };
 
+  // State hooks for experiment settings and UI control
   const [experimentSettings, setExperimentSettings] = useState({
     independentVar: "D",
     inputValues: "",
@@ -55,70 +59,11 @@ function Experiments({ setCurrentPage }) {
   const [experimentsCompleted, setExperimentsCompleted] = useState(false);
   const [showExperimentConfig, setShowExperimentConfig] = useState(true);
 
+  // Constants defining maximum allowed values
   const MAX_VALUES = 99;
   const MAX_INT_VALUE = 99;
 
-  const chartOptions = {
-    scales: {
-      x: {
-        grid: {
-          color: "rgba(255,255,255,0.8)",
-        },
-        title: {
-          display: true,
-          text: `Independent Variable: ${experimentSettings.independentVar}`,
-          color: "white",
-        },
-        scaleLabel: {
-          display: true,
-          labelString: "Square Canvas Dimension",
-          font: {
-            size: 14,
-            color: "white",
-          },
-        },
-      },
-      y: {
-        grid: {
-          color: "rgba(255,255,255,0.9)",
-        },
-        title: {
-          display: true,
-          text: "Number of Paint Drops",
-          color: "white",
-        },
-      },
-    },
-    elements: {
-      line: {
-        borderWidth: 3,
-      },
-      point: {
-        radius: 5,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        borderColor: "rgba(255, 255, 255, 1)",
-      },
-    },
-    maintainAspectRatio: false,
-    responsive: true,
-    layout: {
-      padding: {
-        top: 20,
-        bottom: 50,
-        left: 20,
-        right: 20,
-      },
-    },
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    plugins: {
-      title: {
-        display: true,
-        text: "",
-        color: "white",
-      },
-    },
-  };
-
+  const chartOptions = getChartOptions(experimentSettings);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setExperimentSettings((prevSettings) => ({
@@ -128,12 +73,6 @@ function Experiments({ setCurrentPage }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setIsComputing(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
     const {
       independentVar,
       color1,
@@ -146,6 +85,8 @@ function Experiments({ setCurrentPage }) {
       inputValues,
     } = experimentSettings;
 
+    e.preventDefault();
+
     const { values, error } = checkInput(
       inputValues,
       MAX_VALUES,
@@ -153,9 +94,13 @@ function Experiments({ setCurrentPage }) {
     );
     if (error) {
       setErrorMessage(error);
-      setIsComputing(false);
       return;
     }
+
+    setErrorMessage("");
+    setIsComputing(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     try {
       let experimentResults = await runExperiments(
@@ -304,7 +249,6 @@ function Experiments({ setCurrentPage }) {
   const renderResultsTable = () => {
     if (!chartData || isComputing) return null;
 
-    // Common function to format values
     const formatValue = (value) => {
       if (Math.floor(value) === value) {
         return value.toFixed(0);
