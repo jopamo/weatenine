@@ -56,6 +56,7 @@ function Experiments({ setCurrentPage }) {
   const [showExperimentConfig, setShowExperimentConfig] = useState(true);
 
   const MAX_VALUES = 99;
+  const MAX_INT_VALUE = 99;
 
   const chartOptions = {
     scales: {
@@ -128,6 +129,10 @@ function Experiments({ setCurrentPage }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+    setIsComputing(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     const {
       independentVar,
@@ -140,61 +145,61 @@ function Experiments({ setCurrentPage }) {
       fixedR,
       inputValues,
     } = experimentSettings;
-    const { values, error } = checkInput(inputValues, MAX_VALUES);
 
+    const { values, error } = checkInput(
+      inputValues,
+      MAX_VALUES,
+      MAX_INT_VALUE,
+    );
     if (error) {
       setErrorMessage(error);
+      setIsComputing(false);
       return;
     }
 
-    setErrorMessage("");
-    setIsComputing(true);
+    try {
+      let experimentResults = await runExperiments(
+        independentVar,
+        values,
+        color1,
+        color2,
+        color3,
+        stoppingCriterion,
+        fixedX,
+        fixedY,
+        fixedR,
+      );
 
-    setTimeout(async () => {
-      try {
-        let experimentResults = await runExperiments(
-          independentVar,
-          values,
-          color1,
-          color2,
-          color3,
-          stoppingCriterion,
-          fixedX,
-          fixedY,
-          fixedR,
-        );
+      let allExperimentResults = [];
 
-        let allExperimentResults = [];
+      if (independentVar === "R") {
+        let rCounter = 0;
 
-        if (independentVar === "R") {
-          let rCounter = 0;
-
-          values.forEach((rVal) => {
-            for (let i = 0; i < rVal; i++) {
-              allExperimentResults.push({
-                ...experimentResults[rCounter],
-                independentVarValue: rVal,
-              });
-              rCounter++;
-            }
-          });
-        } else {
-          const resultsPerValue = experimentResults.length / values.length;
-          allExperimentResults = experimentResults.map((result, index) => {
-            const varValue = values[Math.floor(index / resultsPerValue)];
-            return { ...result, independentVarValue: varValue };
-          });
-        }
-
-        setChartData(allExperimentResults);
-      } catch (err) {
-        setErrorMessage(`Error running experiments: ${err.message}`);
-      } finally {
-        setIsComputing(false);
-        setExperimentsCompleted(true);
-        setShowExperimentConfig(false);
+        values.forEach((rVal) => {
+          for (let i = 0; i < rVal; i++) {
+            allExperimentResults.push({
+              ...experimentResults[rCounter],
+              independentVarValue: rVal,
+            });
+            rCounter++;
+          }
+        });
+      } else {
+        const resultsPerValue = experimentResults.length / values.length;
+        allExperimentResults = experimentResults.map((result, index) => {
+          const varValue = values[Math.floor(index / resultsPerValue)];
+          return { ...result, independentVarValue: varValue };
+        });
       }
-    }, 0);
+
+      setChartData(allExperimentResults);
+    } catch (err) {
+      setErrorMessage(`Error running experiments: ${err.message}`);
+    } finally {
+      setIsComputing(false);
+      setExperimentsCompleted(true);
+      setShowExperimentConfig(false);
+    }
   };
 
   function formatFixedValues() {
@@ -253,7 +258,6 @@ function Experiments({ setCurrentPage }) {
   const renderReducedTable = () => {
     if (selectedDependentVars.length === 0 || !chartData) return null;
 
-    // Common function to format values
     const formatValue = (value) => {
       if (value === null || value === undefined) return "N/A";
       return Math.floor(value) === value
@@ -474,191 +478,192 @@ function Experiments({ setCurrentPage }) {
   };
 
   return (
-  <div className="Experiments">
-    <Background />
-    {isComputing ? (
-      renderComputationProgress()
-    ) : (
-      <>
-        {showExperimentConfig && (
-          <>
-            <div className="config-container">
-              <h1>Experiment Configuration</h1>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <label>
-                    Independent Variable:
-                    <select
-                      name="independentVar"
-                      value={experimentSettings.independentVar}
-                      onChange={handleInputChange}
-                    >
-                      <option value="D">D (Square Canvas Dimension)</option>
-                      <option value="X">X (X-Dimension with constant Y)</option>
-                      <option value="R">R (Number of Repetitions)</option>
-                    </select>
-                  </label>
-                </div>
-                <div>
-                  <label>
-                    Values:
-                    <input
-                      type="tel"
-                      name="inputValues"
-                      value={experimentSettings.inputValues}
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                </div>
-                {experimentSettings.independentVar === "D" && (
+    <div className="Experiments">
+      <Background />
+      {isComputing ? (
+        renderComputationProgress()
+      ) : (
+        <>
+          {showExperimentConfig && (
+            <>
+              <div className="config-container">
+                <h1>Experiment Configuration</h1>
+                <form onSubmit={handleSubmit}>
                   <div>
                     <label>
-                      Number of Repetitions:
+                      Independent Variable:
+                      <select
+                        name="independentVar"
+                        value={experimentSettings.independentVar}
+                        onChange={handleInputChange}
+                      >
+                        <option value="D">D (Square Canvas Dimension)</option>
+                        <option value="X">
+                          X (X-Dimension with constant Y)
+                        </option>
+                        <option value="R">R (Number of Repetitions)</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      Values:
                       <input
-                        type="number"
-                        name="fixedR"
-                        value={experimentSettings.fixedR}
+                        type="tel"
+                        name="inputValues"
+                        value={experimentSettings.inputValues}
                         onChange={handleInputChange}
                       />
                     </label>
                   </div>
-                )}
-                {experimentSettings.independentVar === "X" && (
+                  {experimentSettings.independentVar === "D" && (
+                    <div>
+                      <label>
+                        Number of Repetitions:
+                        <input
+                          type="number"
+                          name="fixedR"
+                          value={experimentSettings.fixedR}
+                          onChange={handleInputChange}
+                        />
+                      </label>
+                    </div>
+                  )}
+                  {experimentSettings.independentVar === "X" && (
+                    <div>
+                      <label>
+                        Fixed Y Dimension:
+                        <input
+                          type="number"
+                          name="fixedY"
+                          value={experimentSettings.fixedY}
+                          onChange={handleInputChange}
+                        />
+                      </label>
+                      <label>
+                        Number of Repetitions:
+                        <input
+                          type="number"
+                          name="fixedR"
+                          value={experimentSettings.fixedR}
+                          onChange={handleInputChange}
+                        />
+                      </label>
+                    </div>
+                  )}
+                  {experimentSettings.independentVar === "R" && (
+                    <div>
+                      <label>
+                        Fixed X Dimension:
+                        <input
+                          type="number"
+                          name="fixedX"
+                          value={experimentSettings.fixedX}
+                          onChange={handleInputChange}
+                        />
+                      </label>
+                      <label>
+                        Fixed Y Dimension:
+                        <input
+                          type="number"
+                          name="fixedY"
+                          value={experimentSettings.fixedY}
+                          onChange={handleInputChange}
+                        />
+                      </label>
+                    </div>
+                  )}
                   <div>
                     <label>
-                      Fixed Y Dimension:
+                      Color 1:
                       <input
-                        type="number"
-                        name="fixedY"
-                        value={experimentSettings.fixedY}
-                        onChange={handleInputChange}
-                      />
-                    </label>
-                    <label>
-                      Number of Repetitions:
-                      <input
-                        type="number"
-                        name="fixedR"
-                        value={experimentSettings.fixedR}
+                        type="color"
+                        name="color1"
+                        value={experimentSettings.color1}
                         onChange={handleInputChange}
                       />
                     </label>
                   </div>
-                )}
-                {experimentSettings.independentVar === "R" && (
                   <div>
                     <label>
-                      Fixed X Dimension:
+                      Color 2:
                       <input
-                        type="number"
-                        name="fixedX"
-                        value={experimentSettings.fixedX}
-                        onChange={handleInputChange}
-                      />
-                    </label>
-                    <label>
-                      Fixed Y Dimension:
-                      <input
-                        type="number"
-                        name="fixedY"
-                        value={experimentSettings.fixedY}
+                        type="color"
+                        name="color2"
+                        value={experimentSettings.color2}
                         onChange={handleInputChange}
                       />
                     </label>
                   </div>
-                )}
-                <div>
-                  <label>
-                    Color 1:
-                    <input
-                      type="color"
-                      name="color1"
-                      value={experimentSettings.color1}
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                </div>
-                <div>
-                  <label>
-                    Color 2:
-                    <input
-                      type="color"
-                      name="color2"
-                      value={experimentSettings.color2}
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                </div>
-                <div>
-                  <label>
-                    Color 3:
-                    <input
-                      type="color"
-                      name="color3"
-                      value={experimentSettings.color3}
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                </div>
-                <div>
-                  <label>
-                    Stopping Criterion:
-                    <select
-                      name="stoppingCriterion"
-                      value={experimentSettings.stoppingCriterion}
-                      onChange={handleInputChange}
-                    >
-                      <option value="lastUnpainted">
-                        Last Unpainted Square
-                      </option>
-                      <option value="secondBlob">
-                        Second Paint Blob on a Square
-                      </option>
-                      <option value="allMixedColors">
-                        Entire Board Mixed Colors
-                      </option>
-                    </select>
-                  </label>
-                </div>
-                {errorMessage && <p className="error">{errorMessage}</p>}
-              </form>
-            </div>
+                  <div>
+                    <label>
+                      Color 3:
+                      <input
+                        type="color"
+                        name="color3"
+                        value={experimentSettings.color3}
+                        onChange={handleInputChange}
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <label>
+                      Stopping Criterion:
+                      <select
+                        name="stoppingCriterion"
+                        value={experimentSettings.stoppingCriterion}
+                        onChange={handleInputChange}
+                      >
+                        <option value="lastUnpainted">
+                          Last Unpainted Square
+                        </option>
+                        <option value="secondBlob">
+                          Second Paint Blob on a Square
+                        </option>
+                        <option value="allMixedColors">
+                          Entire Board Mixed Colors
+                        </option>
+                      </select>
+                    </label>
+                  </div>
+                  {errorMessage && <p className="error">{errorMessage}</p>}
+                </form>
+              </div>
 
+              <div className="button-container">
+                <button onClick={handleSubmit}>Run Experiments</button>
+                <div className="background"></div>
+              </div>
+            </>
+          )}
+
+          {experimentsCompleted && showTable && (
+            <div className="config-container">
+              <h1>Experiment Results</h1>
+              {renderDependentVarSelection()}
+              {selectedDependentVars.length > 0
+                ? renderReducedTable()
+                : renderResultsTable()}
+            </div>
+          )}
+
+          {showGraph && (
+            <>
+              {renderGraph()}
+              {renderUserOptions()}
+            </>
+          )}
+
+          {experimentsCompleted && showTable && (
             <div className="button-container">
-              <button onClick={handleSubmit}>Run Experiments</button>
+              <button onClick={handleContinue}>Continue</button>
               <div className="background"></div>
             </div>
-          </>
-        )}
-
-        {experimentsCompleted && showTable && (
-          <div className="config-container">
-            <h1>Experiment Results</h1>
-            {renderDependentVarSelection()}
-            {selectedDependentVars.length > 0
-              ? renderReducedTable()
-              : renderResultsTable()}
-          </div>
-        )}
-
-        {showGraph && (
-          <>
-            {renderGraph()}
-            {renderUserOptions()}
-          </>
-        )}
-
-        {experimentsCompleted && showTable && (
-          <div className="button-container">
-            <button onClick={handleContinue}>Continue</button>
-            <div className="background"></div>
-          </div>
-        )}
-      </>
-    )}
-  </div>
-);
-
+          )}
+        </>
+      )}
+    </div>
+  );
 }
 
 export default Experiments;

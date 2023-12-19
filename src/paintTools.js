@@ -1,5 +1,3 @@
-const MAX_INT_VALUE = 99;
-
 const isMixedColor = (color, originalColors) => {
   const mixed = !originalColors.includes(color);
   //console.log(`isMixedColor: color = ${color}, is mixed = ${mixed}`);
@@ -255,7 +253,7 @@ const PAINT_ONCE = (X, Y, C1, C2, C3, S) => {
   }
 };
 
-export function checkInput(str, maxValues) {
+export function checkInput(str, maxValues, MAX_INT_VALUE) {
   let previousValue = null;
   let values = [];
 
@@ -290,7 +288,7 @@ export function checkInput(str, maxValues) {
           } must be less than or equal to ${MAX_INT_VALUE}.`,
         );
       }
-      if (intValue < previousValue) {
+      if (intValue <= previousValue) {
         throw new Error(
           `Invalid sequence: ${intValue} is not greater than ${previousValue} at position ${
             i + 1
