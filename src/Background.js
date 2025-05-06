@@ -1,84 +1,97 @@
-import React, { useRef, useEffect } from "react";
-import * as PIXI from "pixi.js";
-import { BlurFilter } from "@pixi/filter-blur";
-import { debounce } from "lodash";
-import "./Background.css";
+import React, { useRef, useEffect } from 'react';
+import { Application, Assets, Sprite, BlurFilter } from 'pixi.js';
+import { debounce } from 'lodash';
+import './Background.css';
 
 function Background({ onBackgroundClick }) {
-  const pixiContainer = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const background = new PIXI.Application({
-      resizeTo: window,
-      transparent: true,
-    });
+    let app;
+    let dispose = () => {};
 
-    const currentContainer = pixiContainer.current;
-    currentContainer.appendChild(background.view);
+    (async () => {
 
-    const bg = PIXI.Sprite.from("texture.jpg");
-    bg.width = background.screen.width;
-    bg.height = background.screen.height;
-    background.stage.addChild(bg);
+      app = new Application();
+      await app.init({ resizeTo: window, backgroundAlpha: 0 });
 
-    let scale = 1;
-    let scaleSpeed = 0.0001;
+      if (!containerRef.current) return;
+      containerRef.current.appendChild(app.canvas);
 
-    const paintSplash = PIXI.Sprite.from("splash.png");
-    paintSplash.anchor.set(0.5);
-    paintSplash.x = background.screen.width / 2;
-    paintSplash.y = background.screen.height / 2;
-    background.stage.addChild(paintSplash);
+	  const root = process.env.PUBLIC_URL || '';
+      const urls = [`${root}/texture.jpg`, `${root}/splash.png`];
 
-    const resizeSplash = () => {
-      const scaleX = background.screen.width / paintSplash.texture.width;
-      const scaleY = background.screen.height / paintSplash.texture.height;
-      const coverScale = Math.max(scaleX, scaleY);
+	  const tex   = await Assets.load(urls);
+	  const bgTex = tex[`${root}/texture.jpg`];
+	  const spTex = tex[`${root}/splash.png`];
 
-      paintSplash.scale.set(coverScale);
-      paintSplash.x = background.screen.width / 2;
-      paintSplash.y = background.screen.height / 2;
-    };
+      const bg = new Sprite(bgTex);
+      const splash = new Sprite(spTex);
+      bg.anchor.set(0.5);
+      splash.anchor.set(0.5);
+      app.stage.addChild(bg, splash);
 
-    const blurFilter1 = new BlurFilter();
-    const blurFilter2 = new BlurFilter();
-    paintSplash.filters = [blurFilter2];
+      let coverScale = 1;
 
-    let count = 0;
-    background.ticker.add(() => {
-      count += 0.005;
-      blurFilter1.blur = 20 * Math.cos(count);
-      blurFilter2.blur = 20 * Math.sin(count);
+      const fit = () => {
+        coverScale = Math.max(
+          app.screen.width  / bgTex.width,
+          app.screen.height / bgTex.height,
+        );
+        bg.scale.set(coverScale);
+        bg.position.set(app.screen.width / 2, app.screen.height / 2);
 
-      scale += scaleSpeed;
-      bg.scale.set(scale);
+        const sS = Math.max(
+          app.screen.width  / spTex.width,
+          app.screen.height / spTex.height,
+        );
+        splash.scale.set(sS);
+        splash.position.set(app.screen.width / 2, app.screen.height / 2);
+      };
+      fit();
 
-      if (scale >= 1.5 || scale <= 1.0) {
-        scaleSpeed *= -1;
-      }
+      const blur = new BlurFilter({ blur: 0, padding: 100 });
+      splash.filters = [blur];
 
-      resizeSplash();
-    });
+      const zoomAmp  = 0.05;
+      const moveRad  = 15;
+      const blurBase = 4;
+      const blurSwing = 2;
 
-    const debouncedResizeElements = debounce(resizeSplash, 250);
-    window.addEventListener("resize", debouncedResizeElements);
-    currentContainer.addEventListener("click", onBackgroundClick);
+      let t = 0;
+      app.ticker.add(() => {
+        t += 0.005;
 
-    return () => {
-      window.removeEventListener("resize", debouncedResizeElements);
-      currentContainer.removeEventListener("click", onBackgroundClick);
-      currentContainer.removeChild(background.view);
-      background.destroy(true, {
-        children: true,
-        texture: true,
-        baseTexture: true,
+        blur.blur = blurBase + blurSwing * Math.sin(t * 2);
+
+        const zoomFactor = 2 + zoomAmp * (0.5 + 0.5 * Math.sin(t));
+        bg.scale.set(coverScale * zoomFactor);
+
+        bg.x = app.screen.width  / 2 + moveRad * Math.sin(t * 0.9);
+        bg.y = app.screen.height / 2 + moveRad * Math.cos(t * 0.9);
       });
-    };
+
+      const onResize = debounce(fit, 200);
+      window.addEventListener('resize', onResize);
+      app.canvas.addEventListener('click', onBackgroundClick);
+
+      dispose = () => {
+        window.removeEventListener('resize', onResize);
+        app.canvas.removeEventListener('click', onBackgroundClick);
+        Assets.unload(urls);
+        if (containerRef.current?.contains(app.canvas)) {
+          containerRef.current.removeChild(app.canvas);
+        }
+        app.destroy(true, { children: true });
+      };
+    })();
+
+    return () => dispose();
   }, [onBackgroundClick]);
 
   return (
     <div className="background-container">
-      <div ref={pixiContainer} />
+      <div ref={containerRef} />
     </div>
   );
 }

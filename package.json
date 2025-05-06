@@ -1,16 +1,17 @@
 {
   "name": "color-grid",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "homepage": "/wa9",
   "dependencies": {
-    "@pixi/filter-blur": "^7.3.2",
-    "chart.js": "^4.4.1",
+    "@pixi/filter-blur": "^7.4.3",
+    "chart.js": "^4.4.9",
     "eslint-config-react-app": "^7.0.1",
     "lodash": "^4.17.21",
-    "pixi.js": "^7.3.2",
-    "react": "^18.2.0",
-    "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0",
+    "pixi.js": "^8.9.2",
+    "react": "^19.1.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.1.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {

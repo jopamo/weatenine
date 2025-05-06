@@ -18,10 +18,8 @@ function App({ setCurrentPage }) {
 
   const calculateInitialDimensions = () => {
     const width = window.innerWidth;
-
     const xDimension = Math.floor(width / cellSize);
     const yDimension = Math.floor(window.innerHeight / cellSize);
-
     return { xDimension, yDimension };
   };
 
@@ -55,9 +53,7 @@ function App({ setCurrentPage }) {
     window.addEventListener("resize", debouncedHandleResize);
 
     return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("resize", debouncedHandleResize);
-      }
+      window.removeEventListener("resize", debouncedHandleResize);
     };
   }, [isPainting]);
 
@@ -86,11 +82,9 @@ function App({ setCurrentPage }) {
   }, [dimensions, drawGrid]);
 
   const resetBoardAndCounts = useCallback(() => {
-    //console.log("Resetting board and counts");
-
     const initialGrid = initializeGrid(
       dimensions.xDimension,
-      dimensions.yDimension,
+      dimensions.yDimension
     );
     setGrid(initialGrid);
 
@@ -98,14 +92,11 @@ function App({ setCurrentPage }) {
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
     setColorCounts({ totalColor1: 0, totalColor2: 0, totalColor3: 0 });
-
     setStoppingCriteriaMessage("");
   }, [dimensions]);
 
   const paintAndCheck = useCallback(() => {
     if (!isPaintingRef.current) return;
-
-    //console.log("Painting cell");
 
     const { grid: updatedGrid, paintedCell } = paintRandomCell(
       grid,
@@ -114,27 +105,24 @@ function App({ setCurrentPage }) {
       color1,
       color2,
       color3,
-      colorCounts,
+      colorCounts
     );
 
     setGrid(updatedGrid);
-
-    setColorCounts((prevCounts) => {
-      return {
-        totalColor1:
-          prevCounts.totalColor1 + (paintedCell.color === color1 ? 1 : 0),
-        totalColor2:
-          prevCounts.totalColor2 + (paintedCell.color === color2 ? 1 : 0),
-        totalColor3:
-          prevCounts.totalColor3 + (paintedCell.color === color3 ? 1 : 0),
-      };
-    });
+    setColorCounts((prevCounts) => ({
+      totalColor1:
+        prevCounts.totalColor1 + (paintedCell.color === color1 ? 1 : 0),
+      totalColor2:
+        prevCounts.totalColor2 + (paintedCell.color === color2 ? 1 : 0),
+      totalColor3:
+        prevCounts.totalColor3 + (paintedCell.color === color3 ? 1 : 0),
+    }));
 
     drawCell(
       ctxRef.current,
       paintedCell.x,
       paintedCell.y,
-      updatedGrid[paintedCell.y][paintedCell.x].color,
+      updatedGrid[paintedCell.y][paintedCell.x].color
     );
 
     const result = checkStoppingCriteria(
@@ -142,13 +130,13 @@ function App({ setCurrentPage }) {
       stoppingCriterion,
       color1,
       color2,
-      color3,
+      color3
     );
     if (result.met) {
-      //console.log("Stopping criteria met:", result.message);
-
       clearInterval(paintingIntervalRef.current);
+      paintingIntervalRef.current = null;
       setIsPainting(false);
+      isPaintingRef.current = false;
       setStoppingCriteriaMessage(result.message);
     }
   }, [
@@ -159,29 +147,29 @@ function App({ setCurrentPage }) {
     color2,
     color3,
     colorCounts,
-    stoppingCriterion,
+    stoppingCriterion
   ]);
 
   useEffect(() => {
     if (isPainting) {
-      const intervalId = setInterval(paintAndCheck, 1 / dropSpeed);
-      return () => clearInterval(intervalId);
+      paintingIntervalRef.current = setInterval(
+        paintAndCheck,
+        1000 / dropSpeed // higher dropSpeed => shorter delay
+      );
+      return () => clearInterval(paintingIntervalRef.current);
     }
   }, [isPainting, paintAndCheck, dropSpeed]);
 
   const startPainting = () => {
     resetBoardAndCounts();
-    //console.log("Starting painting");
     isPaintingRef.current = true;
     setIsPainting(true);
 
     requestAnimationFrame(() => {
       const colorsTable = document.getElementById("color-counts");
-
       if (colorsTable) {
         const scrollPosition =
           colorsTable.getBoundingClientRect().top + window.pageYOffset;
-
         window.scrollTo({
           top: scrollPosition,
           behavior: "smooth",
@@ -199,8 +187,6 @@ function App({ setCurrentPage }) {
       alert("Dimensions cannot be negative or zero!");
       return;
     }
-
-    //console.log("Form submitted, starting painting");
     startPainting();
   };
 
@@ -284,12 +270,8 @@ function App({ setCurrentPage }) {
                 disabled={isPainting}
               >
                 <option value="lastUnpainted">Last Unpainted Square</option>
-                <option value="secondBlob">
-                  Second Paint Blob on a Square
-                </option>
-                <option value="allMixedColors">
-                  Entire Board Mixed Colors
-                </option>
+                <option value="secondBlob">Second Paint Blob on a Square</option>
+                <option value="allMixedColors">Entire Board Mixed Colors</option>
               </select>
             </div>
             <div className="form-group drop-speed">
@@ -315,8 +297,7 @@ function App({ setCurrentPage }) {
         </button>
         <br />
         <button onClick={handleContinue}>Continue</button>
-          <div class="background"></div>
-
+        <div className="background"></div>
       </div>
 
       <div className="stopping-criteria-message">
@@ -341,21 +322,21 @@ function App({ setCurrentPage }) {
                 <td
                   className="color-swatch"
                   style={{ backgroundColor: color1 }}
-                ></td>
+                />
                 <td>{colorCounts.totalColor1}</td>
               </tr>
               <tr>
                 <td
                   className="color-swatch"
                   style={{ backgroundColor: color2 }}
-                ></td>
+                />
                 <td>{colorCounts.totalColor2}</td>
               </tr>
               <tr>
                 <td
                   className="color-swatch"
                   style={{ backgroundColor: color3 }}
-                ></td>
+                />
                 <td>{colorCounts.totalColor3}</td>
               </tr>
             </tbody>
